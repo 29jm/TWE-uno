@@ -18,6 +18,15 @@
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        Liste des parties en cours, todo.
+        Liste des parties en cours, todo. <br>
+        <ul>
+        <?php
+            $games = listAvailableGames();
+
+            foreach ($games as $game) {
+                echo "<li>$game[name] (id $game[id])</li>";
+            }
+        ?>
+        </ul>
     </body>
 </html>

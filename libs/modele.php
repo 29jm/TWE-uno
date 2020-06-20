@@ -34,6 +34,34 @@ function createAccount($name, $password) {
 	return SQLInsert($sql);
 }
 
+/* Returns the id of the created game.
+ * TODO: avoid duplicate names.
+ */
+function createGame($name, $adminId) {
+	$sql = "insert into games (name, admin_id, user_to_play) values ($name, $adminId, $adminId)";
+	$id = SQLInsert($sql);
+	$sql = "update users set game_id = $id where id = $adminId";
+	SQLUpdate($sql);
+
+	return $id;
+}
+
+/* Returns an array of games (id, name) that exist but haven't started yet.
+ */
+function listAvailableGames() {
+	$sql = "select id, name from games where has_started=0";
+
+	return parcoursRs(SQLSelect($sql));
+}
+
+function joinGame($userId, $gameId) {
+	// TODO
+}
+
+function numberOfPlayers($gameId) {
+	// TODO
+}
+
 /*
  *
  * Tout ce qui reste ici est à supprimer, ça sert d'exemple.

@@ -9,7 +9,17 @@
         die;
     }
 
-    /* Le plan ici:
+    $userId = $_SESSION["userId"];
+    $gameId = getGameOf($userId);
+
+    echo "Vous êtes player#$userId connecté à la partie #$gameId\n";
+    echo "vos cartes sont: "; tprint(getDeck($userId));
+    $unused = getUnusedCards($gameId);
+    echo "\nil reste " . count($unused) . " cartes à distribuer: \n";
+    tprint($unused);
+    echo "\n";
+
+    /* Le plan ici: (manque l'API backend pour le faire)
      * Quand c'est pas le tour du joueur, on poll le serveur pour savoir quand
      * les tours passent (le joueur en cours est stocké dans une var locale du
      * client), et quand un tour est passé, on met à jour la carte posée au

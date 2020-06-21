@@ -20,3 +20,11 @@ body > div {
   margin-right: auto;
   border: solid grey 1px;
 }
+
+#game-list > li {
+  cursor: pointer;
+}
+
+.selected {
+  background-color: lightblue;
+}

@@ -89,11 +89,19 @@ function joinGame($userId, $gameId) {
 	return true;
 }
 
+function isGameStarted($gameId) {
+	return SQLGetChamp("select has_started from games where id = $gameId") == 1;
+}
+
 function getPlayers($gameId) {
 	$sql = "select id from users where game_id = $gameId";
 	$players = parcoursRs(SQLSelect($sql));
 
 	return mapToArray(parcoursRs(SQLSelect($sql)), "id");
+}
+
+function nameFromId($userId) {
+	return SQLGetChamp("select name from users where id = $userId");
 }
 
 function startGame($gameId) {
@@ -213,6 +221,7 @@ function placeCard($userId, $card) {
 	// Check that this move would in fact be valid
 	// Remove that card from the user's deck
 	// Insert it in the placed_cards table
+	// Check if perhaps we can uno?
 
 	return false;
 }
@@ -228,4 +237,18 @@ function drawCard($userId) {
 	SQLInsert($sql);
 
 	return $options[$index];
+}
+
+function getDirection($gameId) {
+	return SQLGetChamp("select direction from games where id = $gameId");
+}
+
+function reverseDirection($gameId) {
+	$direction = getDirection($gameId) == 0 ? 1 : 0;
+
+	SQLUpdate("update games set direction = $direction where id = $gameId");
+}
+
+function getColor($gameId) {
+	return SQLGetChamp("select color from games where id = $gameId");
 }

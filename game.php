@@ -12,12 +12,50 @@
     $userId = $_SESSION["userId"];
     $gameId = getGameOf($userId);
 
-    echo "Vous êtes player#$userId connecté à la partie #$gameId\n";
-    echo "vos cartes sont: "; tprint(getDeck($userId));
-    $unused = getUnusedCards($gameId);
-    echo "\nil reste " . count($unused) . " cartes à distribuer: \n";
-    tprint($unused);
-    echo "\n";
+    if (valider("state", "GET") == "1") {
+        $top_of_pile = getPlacedCards($gameId);
+
+        if (count($top_of_pile) == 0) {
+            $top_of_pile = "";
+        } else {
+            $top_of_pile = $top_of_pile[count($top_of_pile) - 1];
+        }
+
+        $players = getPlayers($gameId);
+        $others = array();
+
+        foreach ($players as $other) {
+            if ($other == $userId) {
+                continue;
+            }
+
+            $others[$other] = array(
+                "name" => nameFromId($other),
+                "num_cards" => count(getDeck($other))
+            );
+        }
+
+        $response = array(
+            "started" => isGameStarted($gameId),
+            // The card to show on the pile
+            "top_of_pile" => $top_of_pile,
+            // The user's deck, displayed at the bottom of the screen
+            "deck" => getDeck($userId),
+            // Array mapping player ids to their username and number of cards
+            "others" => $others,
+            // 0 means the next to play is the player of next highest id, 1 the opposite
+            "direction" => getDirection($gameId),
+            // Current color to play. Not obvious from top_of_pile when it's a +4
+            "color" => getColor($gameId)
+        );
+
+        echo json_encode($response);
+        die;
+    }
+
+    $userId = $_SESSION["userId"];
+    $gameId = getGameOf($userId);
+
 
     /* Le plan ici: (manque l'API backend pour le faire)
      * Quand c'est pas le tour du joueur, on poll le serveur pour savoir quand
@@ -39,8 +77,17 @@
         <meta charset="UTF-8">
         <title>Uno Online</title>
         <link rel="stylesheet" href="css/style.css">
+        <script src="js/jquery-3.5.1.min.js"></script>
+        <script src="js/game.js"></script>
     </head>
     <body>
-        Jeu de uno, todo.
+        Jeu de uno, todo. <br>
+        <?php
+            echo "Vous êtes player#$userId connecté à la partie #$gameId <br>";
+        ?>
+        L'état actuel de la partie est ou devrait être entièrement représenté par cet objet:
+        <div id="state">
+
+        </div>
     </body>
 </html>

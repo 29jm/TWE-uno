@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 20, 2020 at 02:57 PM
+-- Generation Time: Jun 21, 2020 at 01:16 PM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.6
 
@@ -44,8 +44,16 @@ CREATE TABLE `games` (
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `admin_id` int(11) NOT NULL,
   `has_started` tinyint(1) NOT NULL DEFAULT 0,
-  `user_to_play` int(11) NOT NULL
+  `user_to_play` int(11) NOT NULL,
+  `direction` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `games`
+--
+
+INSERT INTO `games` (`id`, `name`, `admin_id`, `has_started`, `user_to_play`, `direction`) VALUES
+(1, 'Partie Zéro', 1, 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -73,6 +81,13 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `password`, `game_id`) VALUES
+(1, 'johan', '1234', 1);
+
+--
 -- Indexes for dumped tables
 --
 
@@ -86,7 +101,8 @@ ALTER TABLE `decks`
 -- Indexes for table `games`
 --
 ALTER TABLE `games`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `placed_cards`
@@ -98,7 +114,8 @@ ALTER TABLE `placed_cards`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -114,7 +131,7 @@ ALTER TABLE `decks`
 -- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `placed_cards`
@@ -126,7 +143,7 @@ ALTER TABLE `placed_cards`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

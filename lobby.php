@@ -23,14 +23,18 @@
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        Liste des parties en cours, todo. <br>
+        Liste des parties en cours, todo.<br>
         <ul>
         <?php
             $games = listAvailableGames();
 
             foreach ($games as $game) {
-                echo "<li>$game[name] (id $game[id])</li>";
+                $num = count(getPlayers($game["id"]));
+                echo "<li>$game[name] #$game[id]: $num joueurs connectés</li>";
             }
+            // TODO: un script js pour gérer les boutons, actualisation auto de la liste
+            // Le bouton doit faire un post avec "game=$gameId" pour rejoindre une partie,
+            // "create=$gameName" pour créer une partie.
         ?>
         </ul>
     </body>

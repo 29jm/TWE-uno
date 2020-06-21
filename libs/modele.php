@@ -2,6 +2,8 @@
 
 include_once("maLibSQL.pdo.php");
 
+/** User-management stuff **/
+
 function isInGame($userId) {
 	$sql = "select game_id from users where id = $userId";
 	$result = SQLGetChamp($sql);
@@ -33,6 +35,8 @@ function createAccount($name, $password) {
 	return SQLInsert($sql);
 }
 
+/** Game properties stuff **/
+
 /* Returns the id of the created game (do check though).
  * Returns 0 and fails if the name exists.
  */
@@ -54,11 +58,44 @@ function listAvailableGames() {
 }
 
 function joinGame($userId, $gameId) {
+	$sql = "select game_id from users where id = $userId";
+	$result = SQLGetChamp($sql);
+
+	// Already in a game
+	if ($result == -1) {
+		return;
+	}
+
+	$sql = "update users set game_id = $gameId where id = $userId";
+	SQLUpdate($sql);
+
+	// TODO: distribuer ses cartes au joueur $userId
+}
+
+function getPlayers($gameId) {
+	$sql = "select id from users where game_id = $gameId";
+
+	return parcoursRs(SQLSelect($sql));
+}
+
+/** Actual Uno stuff **/
+
+function distributeInitialCards($user) {
+	// TODO: use below
+}
+
+function getNonPlacedCards($gameId) {
 	// TODO
 }
 
-function numberOfPlayers($gameId) {
+function placeCard($userId, $card) {
 	// TODO
+}
+
+/* Tirer de la pioche.
+ */
+function drawCard($userId) {
+	// TODO: use getNonPlacedCards.
 }
 
 /*

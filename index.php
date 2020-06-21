@@ -13,12 +13,23 @@
 
         switch ($action) {
         case "Connexion":
-            // If the login works, "connected" will be set and the next if will do its thing
-            checkUser($name, $password);
+            // If the login works, "connected" will be set by the following call.
+            $result = checkUser($name, $password);
+
+            if (!$result) {
+                $_POST["errorMessage"] = "Identifiants incorrects.";
+            }
+
             break;
         case "Creer un compte":
-            createAccount($name, $password);
-            checkUser($name, $password);
+            $result = createAccount($name, $password);
+
+            if ($result == 1) {
+                checkUser($name, $password);
+            } else {
+                $_POST["errorMessage"] = "Ce pseudo existe déjà.";
+            }
+
             break;
         }
     }
@@ -60,6 +71,11 @@
                 <input type="submit" name="action" value="Creer un compte">
                 <input type="submit" name="action" value="Connexion">
             </form>
+            <?php
+                if ($message = valider("errorMessage", "POST")) {
+                    echo $message;
+                }
+            ?>
         </div>
     </body>
 </html>

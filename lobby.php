@@ -8,6 +8,11 @@
         header("Location: index.php");
         die;
     }
+
+    if (isInGame($_SESSION["userId"])) {
+        header("Location: game.php");
+        die;
+    }
 ?>
 
 <!DOCTYPE html>

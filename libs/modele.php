@@ -29,16 +29,15 @@ function checkUserBdd($name, $password) {
 }
 
 function createAccount($name, $password) {
-	// TODO prevent duplicate usernames
-	$sql = "insert into users (name, password) values ('$name', '$password')";
+	$sql = "insert ignore into users (name, password) values ('$name', '$password')";
 	return SQLInsert($sql);
 }
 
-/* Returns the id of the created game.
- * TODO: avoid duplicate names.
+/* Returns the id of the created game (do check though).
+ * Returns 0 and fails if the name exists.
  */
 function createGame($name, $adminId) {
-	$sql = "insert into games (name, admin_id, user_to_play) values ($name, $adminId, $adminId)";
+	$sql = "insert ignore into games (name, admin_id, user_to_play) values ($name, $adminId, $adminId)";
 	$id = SQLInsert($sql);
 	$sql = "update users set game_id = $id where id = $adminId";
 	SQLUpdate($sql);

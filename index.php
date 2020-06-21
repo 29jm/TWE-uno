@@ -24,7 +24,7 @@
         case "Creer un compte":
             $result = createAccount($name, $password);
 
-            if ($result == 1) {
+            if ($result) {
                 checkUser($name, $password);
             } else {
                 $_POST["errorMessage"] = "Ce pseudo existe déjà.";

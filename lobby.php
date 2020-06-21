@@ -13,6 +13,38 @@
         header("Location: game.php");
         die;
     }
+
+    $userId = $_SESSION["userId"];
+
+    // API handlers
+    if ($action = valider("action")) {
+        switch ($action) {
+        case "Creer":
+            $gameName = valider("create");
+            $result = createGame($gameName, $userId);
+
+            if ($result == 0) {
+                $_POST["errorMessage"] = "Une partie porte déjà ce nom";
+            } else {
+                header("Location: game.php");
+                die;
+            }
+
+            break;
+        case "Rejoindre":
+            $gameId = (int) valider("game");
+            $result = joinGame($userId, $gameId);
+
+            if (!$result) {
+                $_POST["errorMessage"] = "Vous êtes déjà dans une partie";
+            } else {
+                header("Location: game.php");
+                die;
+            }
+
+            break;
+        }
+    }
 ?>
 
 <!DOCTYPE html>

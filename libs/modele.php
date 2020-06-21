@@ -49,10 +49,12 @@ function createAccount($name, $password) {
  * Returns 0 and fails if the name exists.
  */
 function createGame($name, $adminId) {
-	$sql = "insert ignore into games (name, admin_id, user_to_play) values ($name, $adminId, $adminId)";
+	$sql = "insert ignore into games (name, admin_id, user_to_play) values ('$name', $adminId, $adminId)";
 	$id = SQLInsert($sql);
 	$sql = "update users set game_id = $id where id = $adminId";
 	SQLUpdate($sql);
+
+	distributeInitialCards($adminId);
 
 	return $id;
 }
@@ -67,6 +69,7 @@ function listAvailableGames() {
 
 /* Joins a game, returns whether joining that game was a success.
  * Deals the player their initial hand.
+ * TODO: check that $gameId hasn't started.
  */
 function joinGame($userId, $gameId) {
 	$oldGameId = getGameOf($userId);
@@ -189,12 +192,9 @@ function getUnusedCards($gameId) {
 	$usedCards = array_merge($usedCards, getPlacedCards($gameId));
 	$unusedCards = allCards; // it's a copy
 
-	foreach (allCards as $card) {
-		$key = array_search($card, $usedCards);
-
-		if ($key) {
-			array_splice($unusedCards, $key, 1);
-		}
+	foreach ($usedCards as $usedCard) {
+		$index = array_search($usedCard, $unusedCards);
+		array_splice($unusedCards, $index, 1);
 	}
 
 	return $unusedCards;

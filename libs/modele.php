@@ -51,10 +51,13 @@ function createAccount($name, $password) {
 function createGame($name, $adminId) {
 	$sql = "insert ignore into games (name, admin_id, user_to_play) values ('$name', $adminId, $adminId)";
 	$id = SQLInsert($sql);
-	$sql = "update users set game_id = $id where id = $adminId";
-	SQLUpdate($sql);
 
-	distributeInitialCards($adminId);
+	if ($id != 0) {
+		$sql = "update users set game_id = $id where id = $adminId";
+		SQLUpdate($sql);
+
+		distributeInitialCards($adminId);
+	}
 
 	return $id;
 }
@@ -148,7 +151,6 @@ const allCards = array(
 function distributeInitialCards($userId) {
 	$gameId = getGameOf($userId);
 	$options = getUnusedCards($gameId);
-	echo "unused cards are "; tprint($options);
 	$hand = array();
 
 	for ($i = 0; $i < 7; $i++) {

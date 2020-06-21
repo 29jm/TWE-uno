@@ -24,7 +24,7 @@
             $result = createGame($gameName, $userId);
 
             if ($result == 0) {
-                $_POST["errorMessage"] = "Une partie porte déjà ce nom";
+                $_POST["errorMessage"] = "Une partie porte déjà ce nom.";
             } else {
                 header("Location: game.php");
                 die;
@@ -36,7 +36,7 @@
             $result = joinGame($userId, $gameId);
 
             if (!$result) {
-                $_POST["errorMessage"] = "Vous êtes déjà dans une partie";
+                $_POST["errorMessage"] = "Vous êtes déjà dans une partie.";
             } else {
                 header("Location: game.php");
                 die;
@@ -64,7 +64,12 @@
             <input id="create-btn" type="submit" name="action" value="Creer">
             <input id="join-btn" type="submit" name="action" value="Rejoindre">
         </form>
-        Liste des parties en cours, todo.<br>
+        <?php
+            if ($error = valider("errorMessage", "POST")) {
+                echo $error . "<br>";
+            }
+        ?>
+        Liste des parties en cours: <br>
         <ul id="game-list">
         <?php
             $games = listAvailableGames();

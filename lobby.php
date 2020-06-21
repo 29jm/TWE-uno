@@ -9,7 +9,7 @@
         die;
     }
 
-    if (isInGame($_SESSION["userId"])) {
+    if (getGameOf($_SESSION["userId"]) != NOT_IN_GAME) {
         header("Location: game.php");
         die;
     }

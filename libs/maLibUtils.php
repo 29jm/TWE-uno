@@ -1,12 +1,5 @@
 <?php
 
-// V1.0 du 18 mai 2018
-
-/**
- * @file maLibUtils.php
- * Ce fichier définit des fonctions d'accès ou d'affichage pour les tableaux superglobaux
- */
-
 /**
  * Vérifie l'existence (isset) et la taille (non vide) d'un paramètre dans un des tableaux GET, POST, COOKIES, SESSION
  * Renvoie false si le paramètre est vide ou absent
@@ -17,37 +10,36 @@
  * @return string|boolean
  */
 function valider($nom,$type="REQUEST")
-{	
+{
 	switch($type)
 	{
-		case 'REQUEST': 
-		if(isset($_REQUEST[$nom]) && !($_REQUEST[$nom] == "")) 	
-			return proteger($_REQUEST[$nom]); 	
+		case 'REQUEST':
+		if(isset($_REQUEST[$nom]) && !($_REQUEST[$nom] == ""))
+			return proteger($_REQUEST[$nom]);
 		break;
-		case 'GET': 	
-		if(isset($_GET[$nom]) && !($_GET[$nom] == "")) 			
-			return proteger($_GET[$nom]); 
+		case 'GET':
+		if(isset($_GET[$nom]) && !($_GET[$nom] == ""))
+			return proteger($_GET[$nom]);
 		break;
-		case 'POST': 	
-		if(isset($_POST[$nom]) && !($_POST[$nom] == "")) 	
-			return proteger($_POST[$nom]); 		
+		case 'POST':
+		if(isset($_POST[$nom]) && !($_POST[$nom] == ""))
+			return proteger($_POST[$nom]);
 		break;
-		case 'COOKIE': 	
-		if(isset($_COOKIE[$nom]) && !($_COOKIE[$nom] == "")) 	
-			return proteger($_COOKIE[$nom]);	
+		case 'COOKIE':
+		if(isset($_COOKIE[$nom]) && !($_COOKIE[$nom] == ""))
+			return proteger($_COOKIE[$nom]);
 		break;
-		case 'SESSION': 
-		if(isset($_SESSION[$nom]) && !($_SESSION[$nom] == "")) 	
-			return $_SESSION[$nom]; 		
+		case 'SESSION':
+		if(isset($_SESSION[$nom]) && !($_SESSION[$nom] == ""))
+			return $_SESSION[$nom];
 		break;
-		case 'SERVER': 
-		if(isset($_SERVER[$nom]) && !($_SERVER[$nom] == "")) 	
-			return $_SERVER[$nom]; 		
+		case 'SERVER':
+		if(isset($_SERVER[$nom]) && !($_SERVER[$nom] == ""))
+			return $_SERVER[$nom];
 		break;
 	}
-	return false; // Si pb pour récupérer la valeur 
+	return false; // Si pb pour récupérer la valeur
 }
-
 
 /**
  * Vérifie l'existence (isset) et la taille (non vide) d'un paramètre dans un des tableaux GET, POST, COOKIE, SESSION
@@ -88,44 +80,28 @@ function proteger($str)
 		}
 		return $nextTab;
 	}
-	else 	
+	else
 		return addslashes ($str);
 	//return str_replace("'","''",$str); 	//utile pour les serveurs de bdd Crosoft
 }
-
-
 
 function tprint($tab)
 {
 	echo "<pre>\n";
 	print_r($tab);
-	echo "</pre>\n";	
+	echo "</pre>\n";
 }
 
+/* Converts a [ 0 => Array(k => v), ... ] to a [ 0 => v, ... ], removing all
+ * other fields. Useful to process the result of parcoursRs(SQLSelect()) when
+ * the query selects a single field named $key.
+ */
+function mapToArray($array, $key) {
+	$new = array();
 
-function rediriger($url,$qs="")
-{
-	// if ($qs != "")	 $qs = urlencode($qs);	
-	// Il faut respecter l'encodage des caractères dans les chaînes de requêtes
-	// NB : Pose des problèmes en cas de valeurs multiples
-	// TODO: Passer un tabAsso en paramètres
+	foreach ($array as $item) {
+		array_push($new, $item[$key]);
+	}
 
-	if ($qs != "") $qs = "?$qs";
- 
-	header("Location:$url$qs"); // envoi par la méthode GET
-	die(""); // interrompt l'interprétation du code 
-
-	// TODO: on pourrait passer en parametre le message servant au die...
+	return $new;
 }
-
-// TODO: intégrer les redirections vers la page index dans une fonction :
-
-/*
-// Si la page est appelée directement par son adresse, on redirige en passant pas la page index
-if (basename($_SERVER["PHP_SELF"]) != "index.php")
-{
-	header("Location:../index.php");
-	die("");
-}
-*/
-?>

@@ -4,7 +4,7 @@
 
     session_start();
 
-    if (!valider("connected", "SESSION") || !isInGame($_SESSION["userId"])) {
+    if (!valider("connected", "SESSION") || getGameOf($_SESSION["userId"]) == NOT_IN_GAME) {
         header("Location: index.php");
         die;
     }

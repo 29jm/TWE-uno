@@ -4,13 +4,19 @@ include_once("maLibSQL.pdo.php");
 
 /** User-management stuff **/
 
-function isInGame($userId) {
+const NOT_IN_GAME = -1;
+
+/* Returns the id of the game a user is in, or NOT_IN_GAME.
+ */
+function getGameOf($userId) {
 	$sql = "select game_id from users where id = $userId";
 	$result = SQLGetChamp($sql);
 
-	return $result == '1';
+	return $result;
 }
 
+/* Logs in a user. Returns whether the operation succeeded or not.
+ */
 function checkUser($name, $password) {
 	$id = checkUserBdd($name, $password);
 
@@ -30,6 +36,8 @@ function checkUserBdd($name, $password) {
 	return SQLGetChamp($SQL);
 }
 
+/* Returns the new userId if successful, and probably null otherwise.
+ */
 function createAccount($name, $password) {
 	$sql = "insert ignore into users (name, password) values ('$name', '$password')";
 	return SQLInsert($sql);
@@ -57,72 +65,165 @@ function listAvailableGames() {
 	return parcoursRs(SQLSelect($sql));
 }
 
+/* Joins a game, returns whether joining that game was a success.
+ * Deals the player their initial hand.
+ */
 function joinGame($userId, $gameId) {
-	$sql = "select game_id from users where id = $userId";
-	$result = SQLGetChamp($sql);
+	$oldGameId = getGameOf($userId);
 
-	// Already in a game
-	if ($result == -1) {
-		return;
+	if ($oldGameId != NOT_IN_GAME) {
+		return false;
 	}
 
 	$sql = "update users set game_id = $gameId where id = $userId";
 	SQLUpdate($sql);
 
-	// TODO: distribuer ses cartes au joueur $userId
+	distributeInitialCards($userId);
+
+	return true;
 }
 
 function getPlayers($gameId) {
 	$sql = "select id from users where game_id = $gameId";
+	$players = parcoursRs(SQLSelect($sql));
 
-	return parcoursRs(SQLSelect($sql));
+	return mapToArray(parcoursRs(SQLSelect($sql)), "id");
+}
+
+function startGame($gameId) {
+	$sql = "update games set has_started=1 where id = $gameId";
+	SQLUpdate($sql);
+}
+
+function endGame($gameId) {
+	$players = getPlayers($gameId);
+
+	// Could be batched in two query
+	foreach ($players as $userId) {
+		SQLDelete("delete from decks where user_id = $userId");
+		SQLUpdate("update users set game_id = -1 where id = $userId");
+	}
+
+	SQLDelete("delete from placed_cards where game_id = $gameId");
+	SQLDelete("delete from games where id = $gameId");
 }
 
 /** Actual Uno stuff **/
 
-function distributeInitialCards($user) {
-	// TODO: use below
+/* Card names will be CSS class names, with colored cards being named
+ * "color-value" and leading to two classes, "color" and "value".
+ * Or maybe just "color", whoever does that will know better.
+ */
+const allCards = array(
+	// most special cards
+	"joker", "joker", "joker", "joker",
+	"plusfour", "plusfour", "plusfour", "plusfour",
+	// skip turn cards, two of each color
+	"red-skip", "green-skip", "yellow-skip", "blue-skip",
+	"red-skip", "green-skip", "yellow-skip", "blue-skip",
+	// reverse cards
+	"red-reverse", "green-reverse", "yellow-reverse", "blue-reverse",
+	"red-reverse", "green-reverse", "yellow-reverse", "blue-reverse",
+	// +2
+	"red-plustwo", "green-plustwo", "yellow-plustwo", "blue-plustwo",
+	"red-plustwo", "green-plustwo", "yellow-plustwo", "blue-plustwo",
+	// numbers
+	"red-0", "red-1", "red-2", "red-3", "red-4", "red-5", "red-6", "red-7", "red-8", "red-9",
+	         "red-1", "red-2", "red-3", "red-4", "red-5", "red-6", "red-7", "red-8", "red-9",
+	"green-0", "green-1", "green-2", "green-3", "green-4", "green-5", "green-6", "green-7", "green-8", "green-9",
+	           "green-1", "green-2", "green-3", "green-4", "green-5", "green-6", "green-7", "green-8", "green-9",
+	"yellow-0", "yellow-1", "yellow-2", "yellow-3", "yellow-4", "yellow-5", "yellow-6", "yellow-7", "yellow-8", "yellow-9",
+	            "yellow-1", "yellow-2", "yellow-3", "yellow-4", "yellow-5", "yellow-6", "yellow-7", "yellow-8", "yellow-9",
+	"blue-0", "blue-1", "blue-2", "blue-3", "blue-4", "blue-5", "blue-6", "blue-7", "blue-8", "blue-9",
+	          "blue-1", "blue-2", "blue-3", "blue-4", "blue-5", "blue-6", "blue-7", "blue-8", "blue-9",
+);
+
+/* Gives 7 cards to a player.
+ * Note: could reuse `drawCard` but that'd be extra slow because of the inner
+ *   `getUnusedCards` call.
+ */
+function distributeInitialCards($userId) {
+	$gameId = getGameOf($userId);
+	$options = getUnusedCards($gameId);
+	echo "unused cards are "; tprint($options);
+	$hand = array();
+
+	for ($i = 0; $i < 7; $i++) {
+		$chosen = array_rand($options); // index, not the card
+
+		$sql = "insert into decks (user_id, card_name) values ($userId, '$options[$chosen]')";
+		SQLInsert($sql);
+		array_push($hand, $options[$chosen]);
+
+		array_splice($options, $chosen, 1); // avoids calling getUnusedCards again
+	}
 }
 
-function getNonPlacedCards($gameId) {
-	// TODO
+function getDeck($userId) {
+	$gameId = getGameOf($userId);
+	$sql = "select card_name from decks where user_id = $userId";
+
+	return mapToArray(parcoursRs(SQLSelect($sql)), "card_name");
 }
 
+/* Returns the cards placed by players in the order they were placed in.
+ */
+function getPlacedCards($gameId) {
+	$sql = "select card_name from placed_cards where game_id = $gameId order by id asc";
+
+	return mapToArray(parcoursRs(SQLSelect($sql)), "card_name");
+}
+
+/* Cartes dans la pioche, i.e. toutes celles qui ne sont ni placées ni dans la
+ * main d'un joueur.
+ * TODO: (low priority) cache results for p e r f o r m a n c e.
+ */
+function getUnusedCards($gameId) {
+	$usedCards = array();
+	$players = getPlayers($gameId);
+
+	foreach ($players as $userId) {
+		$usedCards = array_merge($usedCards, getDeck($userId));
+	}
+
+	$usedCards = array_merge($usedCards, getPlacedCards($gameId));
+	$unusedCards = allCards; // it's a copy
+
+	foreach (allCards as $card) {
+		$key = array_search($card, $usedCards);
+
+		if ($key) {
+			array_splice($unusedCards, $key, 1);
+		}
+	}
+
+	return $unusedCards;
+}
+
+/* Moves a card from the player's deck to the card stack, if the move is valid.
+ * Returns whether the move was, in fact, valid.
+ */
 function placeCard($userId, $card) {
 	// TODO
+
+	// Check that it's the user's turn (maybe)
+	// Check that the user in fact has that card
+	// Check that this move would in fact be valid
+	// Remove that card from the user's deck
+	// Insert it in the placed_cards table
+
+	return false;
 }
 
 /* Tirer de la pioche.
+ * Returns the drawn card.
  */
 function drawCard($userId) {
-	// TODO: use getNonPlacedCards.
-}
+	$options = getUnusedCards(getGameOf($userId));
+	$index = array_rand($options);
 
-/*
- *
- * Tout ce qui reste ici est à supprimer, ça sert d'exemple.
- *
- */
-
-function getComptes($idUser) {
-	$sql = "select ID_UTILISATEUR, LIB_COMPTE, SOLDE from T_COMPTE where ID_COMPTE=$idUser;";
-	return parcoursRs(SQLSelect($sql));
-}
-
-function ajouterMouvement($idCompte, $type, $montant, $commentaire) {
-	$sql = "insert into T_MOUVEMENT (ID_COMPTE, COMMENTAIRE, MONTANT_MOUVEMENT, NATURE_MOUVEMENT) VALUES ($idCompte, '$commentaire', $montant, '$type')";
+	$sql = "insert into decks (user_id, card_name) values ($userId, $options[$index])";
 	SQLInsert($sql);
 
-	if ($type == "D")
-		$montant = "-" . $montant;
-
-	$sql = "update T_COMPTE set SOLDE = SOLDE + $montant where ID_COMPTE=$idCompte";
-	SQLUpdate($sql);
-}
-
-function getMouvements($idUser) {
-	$sql = "select COMMENTAIRE, MONTANT_MOUVEMENT, DATE_MOUVEMENT, NATURE_MOUVEMENT
-			from T_MOUVEMENT join T_COMPTE on T_MOUVEMENT.ID_COMPTE = T_COMPTE.ID_COMPTE
-			where ID_UTILISATEUR = $idUser";
-	return parcoursRs(SQLSelect($sql));
+	return $options[$index];
 }

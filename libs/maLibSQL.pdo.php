@@ -177,7 +177,7 @@ function parcoursRs($result)
 
 	$result->setFetchMode(PDO::FETCH_ASSOC);
 	while ($ligne = $result->fetch())
-		$tab[]= $ligne;
+		$tab[] = $ligne;
 
 	return $tab;
 }

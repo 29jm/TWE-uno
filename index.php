@@ -43,7 +43,7 @@
     *     Show the index
     */
     if (valider("connected", "SESSION")) {
-        if (isInGame($_SESSION["userId"])) {
+        if (getGameOf($_SESSION["userId"]) != NOT_IN_GAME) {
             header("Location: game.php");
         } else {
             header("Location: lobby.php");

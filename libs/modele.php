@@ -59,6 +59,17 @@ function createGame($name, $adminId) {
 		distributeInitialCards($adminId);
 	}
 
+	// TODO?: choosing before dealing would allow us to skip that expansive call
+	$unusedCards = getUnusedCards($id);
+
+	do {
+		$rand_index = array_rand($unusedCards);
+	} while (in_array(($firstCard = $unusedCards[$rand_index]), array("joker", "plusfour")));
+
+	$firstCard = $unusedCards[$rand_index];
+
+	SQLInsert("insert into placed_cards (game_id, card_name) values ($id, '$firstCard')");
+
 	return $id;
 }
 
@@ -210,24 +221,56 @@ function getUnusedCards($gameId) {
 	return $unusedCards;
 }
 
+function cardColor($card) {
+	if (($index = strpos($card, "-")) !== false) {
+		return substr($card, 0, $index);
+	}
+
+	return null;
+}
+
+function cardSymbol($card) {
+	if (($index = strpos($card, "-")) !== false) {
+		return substr($card, $index + 1);
+	}
+
+	return $card;
+}
+
 /* Moves a card from the player's deck to the card stack, if the move is valid.
  * Returns whether the move was, in fact, valid.
  */
 function placeCard($userId, $card) {
-	// TODO
+	$gameId = getGameOf($userId);
+	$info = parcoursRs(SQLSelect("select * from games where id = $gameId"))[0];
+	$deck = getDeck($userId);
+	$placed = getPlacedCards($gameId);
 
-	// Check that it's the user's turn (maybe)
-	// Check that the user in fact has that card
+	// Sanity checks
+	if ($gameId == NOT_IN_GAME
+		|| $info["user_to_play"] != $userId
+		|| !in_array($card, $deck)
+		|| $info["has_started"] != 1
+		|| count($placed) == 0) {
+
+		return false;
+	}
+
 	// Check that this move would in fact be valid
-	// Remove that card from the user's deck
-	// Insert it in the placed_cards table
-	// Check if perhaps we can uno?
+	// i.e. if good color || joker || +4 || good symbol (number, reverse, plustwo, skip))
+	if ($info["color"] == cardColor($card) || $card == "joker" || $card == "plusfour"
+		|| cardSymbol($placed[count($placed) - 1]) == cardSymbol($card)) {
+
+		SQLDelete("delete from decks where user_id = $userId and card_name = $card");
+		SQLInsert("insert into placed_cards (game_id, card_name) values ($gameId, '$card')");
+		return true;
+	}
 
 	return false;
 }
 
 /* Tirer de la pioche.
- * Returns the drawn card.
+ * Returns the drawn card. Not certain this is useful.
  */
 function drawCard($userId) {
 	$options = getUnusedCards(getGameOf($userId));

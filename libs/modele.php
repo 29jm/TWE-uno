@@ -233,7 +233,7 @@ function drawCard($userId) {
 	$options = getUnusedCards(getGameOf($userId));
 	$index = array_rand($options);
 
-	$sql = "insert into decks (user_id, card_name) values ($userId, $options[$index])";
+	$sql = "insert into decks (user_id, card_name) values ($userId, '$options[$index]')";
 	SQLInsert($sql);
 
 	return $options[$index];
@@ -243,6 +243,31 @@ function getDirection($gameId) {
 	return SQLGetChamp("select direction from games where id = $gameId");
 }
 
+function currentPlayer($gameId) {
+	return SQLGetChamp("select user_to_play from games where id = $gameId");
+}
+
+/* Not right now, but like, later.
+ */
+function nextToPlay($gameId) {
+	$sql = "select user_to_play, direction from games where id = $gameId";
+	$info = parcoursRs(SQLSelect($sql))[0];
+
+	$direction = $info["direction"] == 1 ? 1 : -1;
+	$to_play = $info["user_to_play"];
+	$players = getPlayers($gameId);
+
+	$index = array_search($to_play, $players);
+
+	if ($direction == -1 && $index == 0) {
+		return $players[count($players) - 1];
+	}
+
+	return $players[($index + $direction) % count($players)];
+}
+
+/* May not be useful, prefer issuing a custom query.
+ */
 function reverseDirection($gameId) {
 	$direction = getDirection($gameId) == 0 ? 1 : 0;
 

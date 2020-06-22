@@ -21,28 +21,27 @@
             $top_of_pile = $top_of_pile[count($top_of_pile) - 1];
         }
 
+        // TODO?: returning (id, name) pairs would save us quite some queries later
         $players = getPlayers($gameId);
-        $others = array();
 
         foreach ($players as $other) {
-            if ($other == $userId) {
-                continue;
-            }
-
-            $others[$other] = array(
-                "name" => nameFromId($other),
-                "num_cards" => count(getDeck($other))
-            );
+            $others[nameFromId($other)] = count(getDeck($other));
         }
 
         $response = array(
             "started" => isGameStarted($gameId),
+            // Who are we waiting for?
+            "current_player" => nameFromId(currentPlayer($gameId)),
+            // Who are we? so many questions
+            "username" => nameFromId($userId),
+            // Who should be stressing right now?
+            "next_player" => nameFromId(nextToPlay($gameId)),
             // The card to show on the pile
             "top_of_pile" => $top_of_pile,
             // The user's deck, displayed at the bottom of the screen
             "deck" => getDeck($userId),
-            // Array mapping player ids to their username and number of cards
-            "others" => $others,
+            // Array mapping player names to their number of cards
+            "players_info" => $others,
             // 0 means the next to play is the player of next highest id, 1 the opposite
             "direction" => getDirection($gameId),
             // Current color to play. Not obvious from top_of_pile when it's a +4
@@ -52,10 +51,6 @@
         echo json_encode($response);
         die;
     }
-
-    $userId = $_SESSION["userId"];
-    $gameId = getGameOf($userId);
-
 
     /* Le plan ici: (manque l'API backend pour le faire)
      * Quand c'est pas le tour du joueur, on poll le serveur pour savoir quand

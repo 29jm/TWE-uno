@@ -134,8 +134,7 @@
 
         </div>
     </body>
+    <?php
+        include("templates/footer.php");
+    ?>
 </html>
-
-<?php
-    include("templates/footer.php");
-?>

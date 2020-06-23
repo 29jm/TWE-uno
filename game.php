@@ -140,13 +140,14 @@
         <script src="js/game.js"></script>
     </head>
     <body>
+    <div id="conteneur_game" class="white-box">
         <h1 id="game-name">
             <?php echo getGameName($gameId); ?>
         </h1>
         <button id="start-game" class="game-btn">Lancer la partie</button>
         <button id="end-game" class="game-btn">Terminer la partie</button>
         <br>
-        <div id="players-list"> </div>
+        <div id="players-list"> <div>COUCOU</div></div>
         <div id="card-piles"> </div>
         <div id="player-deck"> </div>
         <button id="uno-btn" class="game-btn">Uno !</button>
@@ -154,6 +155,7 @@
         <pre>
             <code id="state"> </code>
         </pre>
+    </div>
     </body>
     <?php
         include("templates/footer.php");

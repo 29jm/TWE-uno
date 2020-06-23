@@ -4,6 +4,9 @@
 
     session_start();
 
+    /* Si l'utilisateur n'est pas connecté ou bien s'il est déjà dans une partie,
+    on le redirige vers la page adaptée */
+
     if (!valider("connected", "SESSION")) {
         header("Location: index.php");
         die;
@@ -16,7 +19,7 @@
 
     $userId = $_SESSION["userId"];
 
-    // API handlers
+    // En cas d'actions, on effectue les vérifications nécessaires et on redirige vers la page adaptée
     if ($action = valider("action")) {
         switch ($action) {
         case "Créer":
@@ -71,7 +74,7 @@
         <script src="js/lobby.js"></script>
     </head>
     <body>
-        <div id="div-game-list">
+        <div id="div-game-list" class="white-box">
             <h2> Parties en attente de joueurs : </h2>
             <h5> Double-cliquez sur une ligne pour rejoindre la partie </h5>
             <table id="game-list"></table>

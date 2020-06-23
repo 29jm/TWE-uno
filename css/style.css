@@ -1,3 +1,5 @@
+/* Style général */
+
 h1 {
   text-align: center;
 }
@@ -15,33 +17,28 @@ body {
     font-family:'Palatino Linotype';
 }
 
-#index {
-  display: inline-block;
-  padding: 5px;
-  margin-left: auto;
-  margin-right: auto;
-  border: solid grey 1px;
-}
-
-#game-list td {
-  cursor: pointer;
-}
-
-#pied {
-    position: absolute;
-    width: 700px;
-    bottom: 5px;
-    left: 50%;
-    transform: translate(-50%, 0);
+.white-box {
     border:none;
     background-color:white;
     box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
     border-radius: 15px;
 }
 
-#pied > * {
+/* Style du pied de page */
+
+#footer {
+    left: 50%;
+    transform: translate(-50%, 0);
+    position: fixed;
+    width: 700px;
+    bottom: 5px;
+}
+
+#footer > * {
     margin: 30px;
 }
+
+/* Style de la page index.php */
 
 #divAccueilConnexion {
     position: absolute;
@@ -49,24 +46,12 @@ body {
     transform: translate(-50%, -50%);
     width: 400px;
     height: 400px;
-    background-color: white;
-    border-radius: 15px;
-    border:none;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
 }
 
 #accueilConnexion {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-}
-
-#join-btn {
-    display: none;
-}
-
-.game:hover {
-  background-color: lightgrey;
 }
 
 #accueilConnexion > * {
@@ -77,16 +62,26 @@ body {
     margin: 5px;
 }
 
+/* Style de la page lobby.php */
+
+#game-list td {
+  cursor: pointer;
+}
+
+#join-btn {
+    display: none;
+}
+
+.game:hover {
+  background-color: lightgrey;
+}
+
 #div-game-list {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: 700px;
     padding: 20px;
-    background-color: white;
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
@@ -105,20 +100,28 @@ th {
     background-color: #81cddc;
 }
 
+/* Style de la page rules.html */
+
 #divRules {
-    border-radius: 15px;
-    background-color: white;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
-    border: none;
+    position:absolute;
     width: 800px;
     padding: 30px;
     margin: 30px;
+    left: 50%;
+    transform: translate(-50%, 0);
 }
+
+/* Style de la page rules.html */
 
 #players-list {
   display: inline-block;
   min-height: 50px;
   margin: 10px auto;
+  padding:20px;
+  border-radius: 15px;
+  background-color: #e2e2e2;
+  box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+  border: none;
 }
 
 #card-piles .card {
@@ -153,7 +156,7 @@ th {
   text-align: center;
   font-size: 25pt;
   line-height: 120px;
-  border: solid white 7px;
+  border: solid #cacaca 7px;
   border-radius: 5px;
   width: 85px;
   height: 120px;
@@ -162,8 +165,25 @@ th {
 
 .card:hover {
   border: solid #E85D75 7px;
+  box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
 }
 
 .game-btn {
   display: none;
+}
+
+#conteneur_game {
+    margin:40px;
+    padding:40px;
+}
+
+#player-deck {
+  display: inline-block;
+  min-height: 50px;
+  margin: 10px auto;
+  padding:20px;
+  border-radius: 15px;
+  background-color: #e2e2e2;
+  box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+  border: none;
 }

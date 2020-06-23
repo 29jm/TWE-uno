@@ -94,6 +94,7 @@ function updateOthers(players, currentPlayer) {
     let oneHasUno = false;
 
     playersList.empty();
+    playersList.append($("<h3> Joueurs </h3>"));
 
     for (name in players) {
         let playerInfo = makePlayerInfo(name, players[name]);
@@ -177,6 +178,7 @@ function updateCards(newDeck) {
 
     let container = $('#player-deck');
     container.empty();
+    container.append($("<h3> Vos cartes </h3>"));
 
     newDeck.forEach(card => {
         container.append(makeCard(card).click(function(ev) {

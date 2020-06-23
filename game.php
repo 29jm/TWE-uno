@@ -41,8 +41,7 @@
             // 0 means the next to play is the player of next highest id, 1 the opposite
             "direction" => getDirection($gameId),
             // Current color to play. Not obvious from top_of_pile when it's a +4
-            "color" => getColor($gameId),
-            "started" => isGameStarted($gameId),
+            "started" => $started
         );
 
         echo json_encode($response);
@@ -72,7 +71,13 @@
         }
 
         $card = drawCard($userId);
-        echo json_encode(array("success" => true, "card" => $card));
+
+        if ($card) {
+            echo json_encode(array("success" => true, "card" => $card));
+        } else {
+            echo json_encode(array("success" => false, "error" => "No cards to draw from"));
+        }
+
         die;
     }
 
@@ -80,6 +85,11 @@
     if ($card = valider("place", "POST")) {
         if ($userId != currentPlayer($gameId)) {
             echo json_encode(array("success" => false, "error" => "Not your turn"));
+            die;
+        }
+
+        if (cardsToDraw($userId) > 0) {
+            echo json_encode(array("success" => false, "error" => "You need to draw cards"));
             die;
         }
 

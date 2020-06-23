@@ -275,12 +275,14 @@ function placeCard($userId, $card) {
 	// Sanity checks
 	if ($gameId == NOT_IN_GAME
 		|| $info["user_to_play"] != $userId
-		|| !in_array($card, $deck)
+		|| !(in_array($card, $deck) || in_array($sym, $deck))
 		|| $info["has_started"] != 1
 		|| strpos($card, "-") === false) {
 
 		return false;
 	}
+
+	// TODO!!! Disallow +4 when other colors could work
 
 	// Check that this move would in fact be valid
 	// i.e. if good color || joker || +4 || good symbol (number, reverse, plustwo, skip))
@@ -291,11 +293,26 @@ function placeCard($userId, $card) {
 			$info["direction"] = $info["direction"] == 0 ? 1 : 0;
 		}
 
-		$info["user_to_play"] = nextToPlay($gameId);
+		// If there are only two players, the reverse card acts as a skip card
+		if ($sym != "skip" && !($sym == "reverse" && count(getPlayers($gameId)) == 2)) {
+			$info["user_to_play"] = nextToPlay($gameId, $info["direction"]);
+		}
 
-		SQLDelete("delete from decks where user_id = $userId and card_name = '$card'");
+		$toDraw = 0;
+
+		if ($sym == "plustwo") {
+			$toDraw = 2;
+		} else if ($sym == "plusfour") {
+			$toDraw = 4;
+		}
+
+		// Delete something that actually exists in the db
+		$toDelete = in_array($sym, array("joker", "plusfour")) ? $sym : $card;
+
+		SQLDelete("delete from decks where user_id = $userId and card_name = '$toDelete'");
 		SQLInsert("insert into placed_cards (game_id, card_name) values ($gameId, '$card')");
-		SQLUpdate("update games set user_to_play = $info[user_to_play], direction = $info[direction], color = '$color' where id = $gameId");
+		SQLUpdate("update games set user_to_play = $info[user_to_play], direction = $info[direction] where id = $gameId");
+		SQLUpdate("update users set cards_to_draw = $toDraw where id = $info[user_to_play]");
 
 		return true;
 	}
@@ -303,15 +320,33 @@ function placeCard($userId, $card) {
 	return false;
 }
 
-/* Tirer de la pioche.
- * Returns the drawn card. Not certain this is useful.
+/* Tirer de la pioche. Returns the drawn card.
+ * TODO: check there are cards to draw from.
  */
 function drawCard($userId) {
 	$options = getUnusedCards(getGameOf($userId));
+
+	if (count($options) == 0) {
+		return false;
+	}
+
 	$index = array_rand($options);
 	$card = $options[$index];
+	$to_draw = SQLGetChamp("select cards_to_draw from users where id = $userId");
 
 	SQLInsert("insert into decks (user_id, card_name) values ($userId, '$card')");
+
+	if ($to_draw-- > 0) {
+		SQLUpdate("update users set cards_to_draw = $to_draw where id = $userId");
+
+		// We had been forced to draw by a +2 or +4
+		if ($to_draw == 0) {
+			$gameId = getGameOf($userId);
+			$next = nextToPlay($gameId);
+
+			SQLUpdate("update games set user_to_play = $next");
+		}
+	}
 
 	return $card;
 }
@@ -324,18 +359,23 @@ function currentPlayer($gameId) {
 	return SQLGetChamp("select user_to_play from games where id = $gameId");
 }
 
+function cardsToDraw($userId) {
+	return SQLGetChamp("select cards_to_draw from users where id = $userId");
+}
+
 /* Not right now, but like, later.
  * Takes skips cards into account.
- * TODO: when there's only two players and a reverse card is present, count it
- * as a skip card.
  */
-function nextToPlay($gameId) {
+function nextToPlay($gameId, $direction = null) {
 	$sql = "select user_to_play, direction from games where id = $gameId";
 	$info = parcoursRs(SQLSelect($sql))[0];
 	$placed = getPlacedCards($gameId);
-	$skip = cardSymbol(end($placed)) == "skip";
 
-	$direction = ($info["direction"] == 1 ? 1 : -1) * ($skip ? 2 : 1);
+	if ($direction !== null) {
+		$info["direction"] = $direction;
+	}
+
+	$direction = $info["direction"] == 1 ? 1 : -1;
 	$to_play = $info["user_to_play"];
 	$players = getPlayers($gameId);
 
@@ -343,16 +383,4 @@ function nextToPlay($gameId) {
 	$mod = count($players);
 
 	return $players[(abs($index * $mod) + $index) % $mod];
-}
-
-/* May not be useful, prefer issuing a custom query.
- */
-function reverseDirection($gameId) {
-	$direction = getDirection($gameId) == 0 ? 1 : 0;
-
-	SQLUpdate("update games set direction = $direction where id = $gameId");
-}
-
-function getColor($gameId) {
-	return SQLGetChamp("select color from games where id = $gameId");
 }

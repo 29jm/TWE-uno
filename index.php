@@ -31,6 +31,10 @@
             }
 
             break;
+        case "Logout":
+            session_destroy();
+            header("Location: index.php");
+            break;
         }
     }
 

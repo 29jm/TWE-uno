@@ -24,8 +24,6 @@
             $others[nameFromId($other)] = count(getDeck($other));
         }
 
-        $started = isGameStarted($gameId);
-
         $response = array(
             // Who are we?
             "username" => nameFromId($userId),
@@ -56,7 +54,7 @@
             die;
         }
 
-        if ($start == "1") {
+        if ($start == "1" && !$started) {
             startGame($gameId);
         } else {
             endGame($gameId);
@@ -66,7 +64,7 @@
         die;
     }
 
-    if (valider("draw", "POST") == "1") {
+    if (valider("draw", "POST") == "1" && $started) {
         if ($userId != currentPlayer($gameId)) {
             echo json_encode(array("success" => false, "error" => "Not your turn"));
             die;
@@ -84,7 +82,7 @@
     }
 
     // TODO: critical: prevent using this when player HAS to draw cards
-    if ($card = valider("place", "POST")) {
+    if ($card = valider("place", "POST") && $started) {
         if ($userId != currentPlayer($gameId)) {
             echo json_encode(array("success" => false, "error" => "Not your turn"));
             die;

@@ -11,6 +11,7 @@
 
     $userId = $_SESSION["userId"];
     $gameId = getGameOf($userId);
+    $started = isGameStarted($gameId);
 
     if (valider("state", "GET") == "1") {
         $placed = getPlacedCards($gameId);
@@ -40,7 +41,6 @@
             "players_info" => $others,
             // 0 means the next to play is the player of next highest id, 1 the opposite
             "direction" => getDirection($gameId),
-            // Current color to play. Not obvious from top_of_pile when it's a +4
             "started" => $started
         );
 

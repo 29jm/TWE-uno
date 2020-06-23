@@ -12,6 +12,10 @@ function getGameOf($userId) {
 	$sql = "select game_id from users where id = $userId";
 	$result = SQLGetChamp($sql);
 
+	if ($result == 0) {
+		$result = NOT_IN_GAME;
+	}
+
 	return $result;
 }
 
@@ -76,7 +80,7 @@ function createGame($name, $adminId) {
 /* Returns an array of games (id, name) that exist but haven't started yet.
  */
 function listAvailableGames() {
-	$sql = "select id, name from games where has_started=0";
+	$sql = "select id, name, admin_id from games where has_started = 0";
 
 	return parcoursRs(SQLSelect($sql));
 }

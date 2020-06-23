@@ -69,18 +69,18 @@
     <body>
         <div id="divAccueilConnexion">
             <div id="accueilConnexion">
-                <img src="ressources/logo_uno.png" alt="logo uno">
-                    <form action="" method="post">
-                        <input type="text" name="name" placeholder="Nom d'utilisateur">
-                        <input type="password" name="password" placeholder="Mot de passe">
-                        <input type="submit" name="action" value="Connexion">
-                        <input type="submit" name="action" value="Créer un compte">
-                    </form>
-                    <?php
-                        if ($message = valider("errorMessage", "POST")) {
-                            echo $message;
-                        }
-                    ?>
+            <img src="ressources/logo_uno.png" alt="logo uno">
+                <form action="" method="post">
+                    <input type="text" name="name" placeholder="Nom d'utilisateur">
+                    <input type="password" name="password" placeholder="Mot de passe">
+                    <input type="submit" name="action" value="Connexion">
+                    <input type="submit" name="action" value="Créer un compte">
+                </form>
+                <?php
+                    if ($message = valider("errorMessage", "POST")) {
+                        echo $message;
+                    }
+                ?>
             </div>
         </div>
     </body>

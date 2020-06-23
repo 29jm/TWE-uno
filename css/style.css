@@ -64,3 +64,25 @@ body > div {
 #accueilConnexion > form > * {
     margin: 5px;
 }
+
+#div-game-list {
+    position:absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    padding: 20px;
+    background-color:white;
+    border-radius: 10px;
+    border:none;
+    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 7px;
+}
+
+table {
+    margin: auto;
+    border: 1px black solid;
+    border-radius: 10px;
+}

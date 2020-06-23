@@ -1,14 +1,18 @@
 $(function() {
     $('.game').click(function(ev) {
-        $('.game').removeClass('selected');
-        $(ev.target).addClass('selected');
-        $('#join-text').val(ev.target.id);
-    })
+        let row = $(ev.target).parents("tr");
+        $('.game').siblings().removeClass('selected');
+        row.toggleClass('selected');
+        $('#join-text').val(row.attr('id'));
+    });
 
     $('.game').dblclick(function(ev) {
-        var gameId = ev.target.id;
-
-        $('#join-text').val(gameId);
+        let row = $(ev.target).parents("tr");
+        $('#join-text').val(row.attr('id'));
         $('#join-btn')[0].click();
     });
 });
+
+function update() {
+    setTimeout(function() { document.location.reload(true); }, 2000);
+}

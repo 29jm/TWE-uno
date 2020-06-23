@@ -151,16 +151,27 @@ function updateCards(newDeck) {
 
     newDeck.forEach(card => {
         container.append(makeCard(card).click(function(ev) {
-            console.log("card clicked: "+card);
+            let cardName = card;
+
             if (card == "plusfour" || card == "joker") {
-                console.log("placing black cards is unimplemented right now");
-                return;
+                let color = "";
+
+                do {
+                    color = prompt("Entrez la couleur voulue:")
+
+                    if (color === null) {
+                        return;
+                    }
+
+                } while (!["red", "green", "yellow", "blue"].includes(color));
+
+                cardName = color + "-" + card;
             }
 
             $.ajax({
                 type: "POST",
                 url: this.href,
-                data: { place: card },
+                data: { place: cardName },
                 dataType: "json",
                 success: function(response) {
                     if (response.success) {

@@ -15,7 +15,7 @@ body {
     font-family:'Palatino Linotype';
 }
 
-body > div {
+#index {
   display: inline-block;
   padding: 5px;
   margin-left: auto;
@@ -113,4 +113,26 @@ th {
     width: 800px;
     padding: 30px;
     margin: 30px;
+}
+
+#players-list {
+  border: solid black 1px;
+}
+
+.card {
+  display: inline-block;
+  text-align: center;
+  border: dashed black 2px;
+  border-radius: 5px;
+  width: 85px;
+  height: 120px;
+  margin: 5px;
+}
+
+.card:hover {
+  border: solid black 2px;
+}
+
+#start-game {
+  display: none;
 }

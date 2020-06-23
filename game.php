@@ -135,13 +135,15 @@
         <script src="js/game.js"></script>
     </head>
     <body>
-        Jeu de uno, todo. <br>
-        <?php
-            echo "Vous êtes player#$userId connecté à la partie #$gameId <br>";
-        ?>
-        L'état actuel de la partie est ou devrait être entièrement représenté par cet objet:
-        <div id="state">
-
+        Jeu de uno <button id="start-game">Lancer la partie</button>
+        <div id="state"></div>
+        <div id="players-list">
+        </div>
+        <div id="card-piles">
+            <span id="draw-pile"></span>
+            <span id="placed-pile"></span>
+        </div>
+        <div id="player-deck">
         </div>
     </body>
     <?php

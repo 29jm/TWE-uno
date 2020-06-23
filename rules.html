@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Uno Online</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <div id="divRules">
+            <img src="ressources/logo_uno.png" alt="logo uno">
+            <h1>Règles du jeu</h1>
+            <p> Nombre de joueurs : entre 2 et 10.
+            </p>
+            <p> L'objectif est de se débarrasser de toutes ses cartes.
+            Initialement, chaque joueur possède 7 cartes et la première carte de la pioche est retournée, face visible.
+            À chaque tour, le joueur doit recouvrir la carte dévoilée précédemment par une de ses cartes de la même couleur, du même chiffre
+            ou du même symbole. Les cartes joker ou +4 peuvent être posées dans tous les cas. 
+            Si le joueur est dans l'impossibilité de poser une carte, il doit en piocher une, qu'il peut poser immédiatement si cela est possible.
+            Lorsqu'un joueur n'a plus qu'une carte, il doit cliquer sur le bouton "Uno" avant que les autres joueurs cliquent sur le bouton "Contre-Uno".
+            Dans le cas contraire, il prend une pénalité de 2 cartes. Le gagnant est le premier à ne plus avoir de cartes.
+            </p>
+            <p> Placez votre souris sur une des cartes spéciales pour voir son effet particulier :
+            </p>
+            <div id="cartes">
+            <span title="Le sens du jeu est inversé !">
+            <img src="ressources/chgmt_sens.png" alt="changement de sens">
+            </span>
+            <span title="Le joueur peut choisir la couleur de jeu.">
+            <img src="ressources/joker.png" alt="joker">
+            </span>
+            <span title="Le joueur suivant passe son tour !">
+            <img src="ressources/passe_tour.png" alt="passe tour">
+            </span>
+            <span title="Le joueur suivant doit piocher deux cartes et il passe son tour.">
+            <img src="ressources/plus2.png" alt="+2">
+            </span>
+            <span title="Le joueur suivant doit piocher quatre cartes et il passe son tour. Le joueur qui a posé la carte peut choisir la couleur de jeu.">
+            <img src="ressources/plus4.png" alt="+4">
+            </span>
+            </div>
+            <a href="index.php">Retour au jeu</a>
+        </div>
+    </body>
+</html>

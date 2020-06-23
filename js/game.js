@@ -5,6 +5,7 @@ let topCard;
 let queryHandler;
 
 $(function() {
+    queryGameInfo();
     queryHandler = setInterval(queryGameInfo, interval);
 });
 
@@ -14,31 +15,36 @@ function queryGameInfo() {
         url: this.href,
         data: { state: 1 },
         success: function(response) {
-            $('#state').html(JSON.stringify(response));
+            // $('#state').html(JSON.stringify(response, null, 2));
 
             username = response.username;
 
-            if (!response.started && response.is_admin) {
-                $('#start-game').show().click(function() {
-                    startGame();
-                    $('#start-game').hide();
-                });
+            if (!response.started && Object.keys(response.players_info).length >= 2 && response.is_admin) {
+                $('#start-game').show().click(startGame);
             }
 
-            updateOthers(response.players_info);
+            if (response.started && response.is_admin) {
+                $('#end-game').show().click(endGame);
+            }
+
+            updateOthers(response.players_info, response.current_player);
             updatePiles(response.top_of_pile);
             updateCards(response.deck);
 
             if (response.current_player == response.username) {
-                console.log("It's our turn to play");
                 enterTurn();
             }
+        },
+        error: function() {
+            window.location.reload();
         },
         dataType: "json"
     });
 }
 
 function startGame() {
+    $('#start-game').hide();
+
     $.ajax({
         type: "POST",
         url: this.href,
@@ -49,7 +55,21 @@ function startGame() {
                 console.log("The game has started");
             }
         }
-    })
+    });
+}
+
+function endGame() {
+    $.ajax({
+        type: "POST",
+        url: this.href,
+        data: { start: 2 },
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                window.location.reload();
+            }
+        }
+    });
 }
 
 function enterTurn() {
@@ -68,17 +88,24 @@ function exitTurn() {
     // TODO:
     // - disable click handlers
 
+    queryGameInfo();
     queryHandler = setInterval(queryGameInfo, interval);
 }
 
-function updateOthers(players) {
-    let info = "";
+function updateOthers(players, currentPlayer) {
+    let playersList = $('#players-list');
+
+    playersList.empty();
 
     for (name in players) {
-        info += name + " (" + players[name] + " cards); ";
-    }
+        let playerInfo = makePlayerInfo(name, players[name]);
 
-    $('#players-list').html(info);
+        if (name == currentPlayer) {
+            playerInfo.addClass('player-current');
+        }
+
+        playersList.append(playerInfo);
+    }
 }
 
 function updatePiles(newTopCard) {
@@ -88,8 +115,10 @@ function updatePiles(newTopCard) {
 
     topCard = newTopCard;
 
-    $('#draw-pile').empty();
-    $('#draw-pile').append(makeCard("backside").click(function(ev) {
+    let piles = $('#card-piles');
+
+    piles.empty();
+    piles.append(makeCard("backside").click(function(ev) {
         console.log("Pioche cliquée");
         $.ajax({
             type: "POST",
@@ -107,8 +136,7 @@ function updatePiles(newTopCard) {
         });
     }));
 
-    $('#placed-pile > *').remove();
-    $('#placed-pile').append(makeCard(newTopCard));
+    piles.append(makeCard(newTopCard));
 }
 
 function updateCards(newDeck) {
@@ -117,7 +145,6 @@ function updateCards(newDeck) {
     }
 
     deck = newDeck;
-    console.log("updating cards");
 
     let container = $('#player-deck');
     container.empty();
@@ -151,24 +178,46 @@ function updateCards(newDeck) {
 /* Makes the proper div, no handler.
  */
 function makeCard(card) {
-    let elem = $('<div class="card"></div>');
+    let div = $('<div class="card"></div>');
+    let elem = $('<span></span>');
+    let colors = {
+        "red": '#ff5555',
+        "green": '#55aa55',
+        "yellow": '#ffaa00',
+        "blue": '#5555ff',
+        "black": '#000000'
+    };
+    let contents = {
+        "plusfour": '+4',
+        "plustwo": '+2',
+        "joker": '★',
+        "backside": 'Uno',
+        "reverse": '⟳'
+    };
 
+    let color = "black";
+    let content = contents[card];
 
     if (card.includes("-")) {
         let parts = card.split("-");
+        color = parts[0];
+        content = parts[1];
 
-        // Replace the color by a class for more control
-        elem.css('background-color', parts[0]) // color
-        elem.html(parts[1]); // card name
-    } else {
-        elem.css('background-color', 'black');
-        elem.css('color', 'white');
-        elem.html(card);
+        if (content in contents) {
+            content = contents[content];
+        }
     }
 
-    if (card == "backside") {
-        elem.html("Pioche");
-    }
+    div.css('color', 'white');
+    div.css('background-color', colors[color]);
+    elem.html(content);
+
+    return div.append(elem);
+}
+
+function makePlayerInfo(name, numCards) {
+    let elem = $('<div class=player-info></div>')
+        .append('<span>' + name + '<br>' + numCards + ' cartes' + '</span>');
 
     return elem;
 }

@@ -108,6 +108,10 @@ function isGameStarted($gameId) {
 	return SQLGetChamp("select has_started from games where id = $gameId") == 1;
 }
 
+function getGameName($gameId) {
+	return SQLGetChamp("select name from games where id = $gameId");
+}
+
 function getGameAdmin($gameId) {
 	return SQLGetChamp("select admin_id from games where id = $gameId");
 }

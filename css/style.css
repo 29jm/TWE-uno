@@ -116,13 +116,44 @@ th {
 }
 
 #players-list {
-  border: solid black 1px;
+  display: inline-block;
+  min-height: 50px;
+  margin: 10px auto;
+}
+
+#card-piles .card {
+  display: inline-block;
+}
+
+.player-info {
+  display: inline-block;
+  line-height: 3em;
+  border: solid #62c370 1px;
+  background-color: #9ad1d4;
+  border-radius: 7px;
+  vertical-align: middle;
+  width: 100px;
+  height: 3em;
+  margin-right: 5px;
+}
+
+.player-info > span,
+.card > span {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+
+.player-current {
+  border: solid #62c370 7px;
 }
 
 .card {
   display: inline-block;
   text-align: center;
-  border: dashed black 2px;
+  font-size: 25pt;
+  line-height: 120px;
+  border: solid white 7px;
   border-radius: 5px;
   width: 85px;
   height: 120px;
@@ -130,9 +161,9 @@ th {
 }
 
 .card:hover {
-  border: solid black 2px;
+  border: solid #E85D75 7px;
 }
 
-#start-game {
+#start-game, #end-game {
   display: none;
 }

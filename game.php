@@ -24,11 +24,13 @@
             $others[nameFromId($other)] = count(getDeck($other));
         }
 
+        $started = isGameStarted($gameId);
+
         $response = array(
             // Who are we?
             "username" => nameFromId($userId),
             // Who are we waiting for?
-            "current_player" => nameFromId(currentPlayer($gameId)),
+            "current_player" => $started ? nameFromId(currentPlayer($gameId)) : "",
             // Who should be stressing right now?
             "next_player" => nameFromId(nextToPlay($gameId)),
             // Are you the admin?
@@ -135,16 +137,18 @@
         <script src="js/game.js"></script>
     </head>
     <body>
-        Jeu de uno <button id="start-game">Lancer la partie</button>
-        <div id="state"></div>
-        <div id="players-list">
-        </div>
-        <div id="card-piles">
-            <span id="draw-pile"></span>
-            <span id="placed-pile"></span>
-        </div>
-        <div id="player-deck">
-        </div>
+        <h1 id="game-name">
+            <?php echo getGameName($gameId); ?>
+        </h1>
+        <button id="start-game">Lancer la partie</button>
+        <button id="end-game">Terminer la partie</button>
+        <br>
+        <div id="players-list"> </div>
+        <div id="card-piles"> </div>
+        <div id="player-deck"> </div>
+        <pre>
+            <code id="state"> </code>
+        </pre>
     </body>
     <?php
         include("templates/footer.php");

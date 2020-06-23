@@ -13,13 +13,8 @@
     $gameId = getGameOf($userId);
 
     if (valider("state", "GET") == "1") {
-        $top_of_pile = getPlacedCards($gameId);
-
-        if (count($top_of_pile) == 0) {
-            $top_of_pile = "";
-        } else {
-            $top_of_pile = $top_of_pile[count($top_of_pile) - 1];
-        }
+        $placed = getPlacedCards($gameId);
+        $top_of_pile = end($placed);
 
         // TODO?: returning (id, name) pairs would save us quite some queries later
         $players = getPlayers($gameId);
@@ -29,13 +24,14 @@
         }
 
         $response = array(
-            "started" => isGameStarted($gameId),
+            // Who are we?
+            "username" => nameFromId($userId),
             // Who are we waiting for?
             "current_player" => nameFromId(currentPlayer($gameId)),
-            // Who are we? so many questions
-            "username" => nameFromId($userId),
             // Who should be stressing right now?
             "next_player" => nameFromId(nextToPlay($gameId)),
+            // Are you the admin?
+            "is_admin" => getGameAdmin($gameId) == $userId,
             // The card to show on the pile
             "top_of_pile" => $top_of_pile,
             // The user's deck, displayed at the bottom of the screen
@@ -45,7 +41,8 @@
             // 0 means the next to play is the player of next highest id, 1 the opposite
             "direction" => getDirection($gameId),
             // Current color to play. Not obvious from top_of_pile when it's a +4
-            "color" => getColor($gameId)
+            "color" => getColor($gameId),
+            "started" => isGameStarted($gameId),
         );
 
         echo json_encode($response);
@@ -54,7 +51,7 @@
 
     if ($start = valider("start", "POST")) {
         if ($userId != getGameAdmin($gameId)) {
-            echo json_encode(array("success" => false));
+            echo json_encode(array("success" => false, "error" => "Not the admin"));
             die;
         }
 
@@ -70,7 +67,7 @@
 
     if (valider("draw", "POST") == "1") {
         if ($userId != currentPlayer($gameId)) {
-            echo json_encode(array("success" => false));
+            echo json_encode(array("success" => false, "error" => "Not your turn"));
             die;
         }
 
@@ -82,13 +79,14 @@
     // TODO: critical: prevent using this when player HAS to draw cards
     if ($card = valider("place", "POST")) {
         if ($userId != currentPlayer($gameId)) {
+            echo json_encode(array("success" => false, "error" => "Not your turn"));
             die;
         }
 
         if (placeCard($userId, $card)) {
             echo json_encode(array("success" => true));
         } else {
-            echo json_encode(array("success" => false));
+            echo json_encode(array("success" => false, "error" => "Invalid move"));
         }
 
         die;

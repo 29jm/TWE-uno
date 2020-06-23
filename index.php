@@ -64,12 +64,12 @@
     </head>
     <body>
         <h1>Uno</h1>
-        <div>
+        <div id="index">
             <form action="" method="post">
                 <input type="text" name="name" placeholder="Nom d'utilisateur">
                 <input type="password" name="password" placeholder="Mot de passe">
                 <input type="submit" name="action" value="Creer un compte">
-                <input type="submit" name="action" value="Connexion">
+                <input type="submit" name="action" value="Connexion" autofocus>
             </form>
             <?php
                 if ($message = valider("errorMessage", "POST")) {

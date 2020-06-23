@@ -144,7 +144,7 @@ function endGame($gameId) {
  * Or maybe just "color", whoever does that will know better.
  */
 const allCards = array(
-	// most special cards
+	// black cards
 	"joker", "joker", "joker", "joker",
 	"plusfour", "plusfour", "plusfour", "plusfour",
 	// skip turn cards, two of each color
@@ -239,6 +239,8 @@ function getUnusedCards($gameId) {
 	return $unusedCards;
 }
 
+/* "$color-$symbol" => "$color".
+ */
 function cardColor($card) {
 	if (($index = strpos($card, "-")) !== false) {
 		return substr($card, 0, $index);
@@ -247,6 +249,8 @@ function cardColor($card) {
 	return null;
 }
 
+/* "$color-$symbol" => "$symbol".
+ */
 function cardSymbol($card) {
 	if (($index = strpos($card, "-")) !== false) {
 		return substr($card, $index + 1);
@@ -263,7 +267,8 @@ function placeCard($userId, $card) {
 	$gameId = getGameOf($userId);
 	$info = parcoursRs(SQLSelect("select * from games where id = $gameId"))[0];
 	$deck = getDeck($userId);
-	$lastPlaced = end(getPlacedCards($gameId));
+	$placed = getPlacedCards($gameId);
+	$lastPlaced = end($placed);
 	$sym = cardSymbol($card);
 	$color = cardColor($card);
 
@@ -288,13 +293,9 @@ function placeCard($userId, $card) {
 
 		$info["user_to_play"] = nextToPlay($gameId);
 
-		SQLDelete("delete from decks where user_id = $userId and card_name = $card");
+		SQLDelete("delete from decks where user_id = $userId and card_name = '$card'");
 		SQLInsert("insert into placed_cards (game_id, card_name) values ($gameId, '$card')");
-		SQLUpdate("update games set
-			user_to_play = $info[user_to_play],
-			direction = $info[direction],
-			color = $color
-			where id = $gameId");
+		SQLUpdate("update games set user_to_play = $info[user_to_play], direction = $info[direction], color = '$color' where id = $gameId");
 
 		return true;
 	}
@@ -331,7 +332,8 @@ function currentPlayer($gameId) {
 function nextToPlay($gameId) {
 	$sql = "select user_to_play, direction from games where id = $gameId";
 	$info = parcoursRs(SQLSelect($sql))[0];
-	$skip = cardSymbol(end(getPlacedCards($gameId))) == "skip";
+	$placed = getPlacedCards($gameId);
+	$skip = cardSymbol(end($placed)) == "skip";
 
 	$direction = ($info["direction"] == 1 ? 1 : -1) * ($skip ? 2 : 1);
 	$to_play = $info["user_to_play"];
@@ -340,7 +342,7 @@ function nextToPlay($gameId) {
 	$index = array_search($to_play, $players) + $direction;
 	$mod = count($players);
 
-	return (abs($index * $mod) + $index) % $mod;
+	return $players[(abs($index * $mod) + $index) % $mod];
 }
 
 /* May not be useful, prefer issuing a custom query.

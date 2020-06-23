@@ -52,6 +52,57 @@
         die;
     }
 
+    if ($start = valider("start", "POST")) {
+        if ($userId != getGameAdmin($gameId)) {
+            echo json_encode(array("success" => false));
+            die;
+        }
+
+        if ($start == "1") {
+            startGame($gameId);
+        } else {
+            endGame($gameId);
+        }
+
+        echo json_encode(array("success" => true));
+        die;
+    }
+
+    if (valider("draw", "POST") == "1") {
+        if ($userId != currentPlayer($gameId)) {
+            echo json_encode(array("success" => false));
+            die;
+        }
+
+        $card = drawCard($userId);
+        echo json_encode(array("success" => true, "card" => $card));
+        die;
+    }
+
+    // TODO: critical: prevent using this when player HAS to draw cards
+    if ($card = valider("place", "POST")) {
+        if ($userId != currentPlayer($gameId)) {
+            die;
+        }
+
+        if (placeCard($userId, $card)) {
+            echo json_encode(array("success" => true));
+        } else {
+            echo json_encode(array("success" => false));
+        }
+
+        die;
+    }
+
+    /* How to deal with black cards: an authoritative paper.
+     * The server will only ever distribute uncolored black cards, i.e. one of
+     * "plusfour" and "joker".
+     * On the contrary, every move proposed by the client is to involve a
+     * colored card, i.e. "red-3", "yellow-joker" or "green-plusfour".
+     * As such, the "decks" table will contain nothing but uncolored black
+     * cards, and "placed_cards" will contain only colored black cards.
+     */
+
     /* Le plan ici: (manque l'API backend pour le faire)
      * Quand c'est pas le tour du joueur, on poll le serveur pour savoir quand
      * les tours passent (le joueur en cours est stocké dans une var locale du

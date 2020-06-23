@@ -64,7 +64,7 @@ function createGame($name, $adminId) {
 
 	do {
 		$rand_index = array_rand($unusedCards);
-	} while (in_array(($firstCard = $unusedCards[$rand_index]), array("joker", "plusfour")));
+	} while (($firstCard = $unusedCards[$rand_index]) == "plusfour");
 
 	$firstCard = $unusedCards[$rand_index];
 
@@ -102,6 +102,10 @@ function joinGame($userId, $gameId) {
 
 function isGameStarted($gameId) {
 	return SQLGetChamp("select has_started from games where id = $gameId") == 1;
+}
+
+function getGameAdmin($gameId) {
+	return SQLGetChamp("select admin_id from games where id = $gameId");
 }
 
 function getPlayers($gameId) {
@@ -191,11 +195,25 @@ function getDeck($userId) {
 }
 
 /* Returns the cards placed by players in the order they were placed in.
+ * If $filter == true, black cards are stripped of their assigned colors.
  */
-function getPlacedCards($gameId) {
+function getPlacedCards($gameId, $filter=false) {
 	$sql = "select card_name from placed_cards where game_id = $gameId order by id asc";
+	$cards = mapToArray(parcoursRs(SQLSelect($sql)), "card_name");
 
-	return mapToArray(parcoursRs(SQLSelect($sql)), "card_name");
+	if (!$filter) {
+		return $cards;
+	}
+
+	foreach ($cards as $index => $card) {
+		$sym = cardSymbol($card);
+
+		if ($sym == "joker" || $sym == "plusfour") {
+			$cards[$index] = cardSymbol($card);
+		}
+	}
+
+	return $cards;
 }
 
 /* Cartes dans la pioche, i.e. toutes celles qui ne sont ni placées ni dans la
@@ -210,7 +228,7 @@ function getUnusedCards($gameId) {
 		$usedCards = array_merge($usedCards, getDeck($userId));
 	}
 
-	$usedCards = array_merge($usedCards, getPlacedCards($gameId));
+	$usedCards = array_merge($usedCards, getPlacedCards($gameId, true));
 	$unusedCards = allCards; // it's a copy
 
 	foreach ($usedCards as $usedCard) {
@@ -239,30 +257,45 @@ function cardSymbol($card) {
 
 /* Moves a card from the player's deck to the card stack, if the move is valid.
  * Returns whether the move was, in fact, valid.
+ * Note: does not handle drawing cards from the pile in case of plustwo etc...
  */
 function placeCard($userId, $card) {
 	$gameId = getGameOf($userId);
 	$info = parcoursRs(SQLSelect("select * from games where id = $gameId"))[0];
 	$deck = getDeck($userId);
-	$placed = getPlacedCards($gameId);
+	$lastPlaced = end(getPlacedCards($gameId));
+	$sym = cardSymbol($card);
+	$color = cardColor($card);
 
 	// Sanity checks
 	if ($gameId == NOT_IN_GAME
 		|| $info["user_to_play"] != $userId
 		|| !in_array($card, $deck)
 		|| $info["has_started"] != 1
-		|| count($placed) == 0) {
+		|| strpos($card, "-") === false) {
 
 		return false;
 	}
 
 	// Check that this move would in fact be valid
 	// i.e. if good color || joker || +4 || good symbol (number, reverse, plustwo, skip))
-	if ($info["color"] == cardColor($card) || $card == "joker" || $card == "plusfour"
-		|| cardSymbol($placed[count($placed) - 1]) == cardSymbol($card)) {
+	if (cardColor($lastPlaced) == $color || $sym == "joker" || $sym == "plusfour"
+		|| cardSymbol($lastPlaced) == $sym) {
+
+		if ($sym == "reverse") {
+			$info["direction"] = $info["direction"] == 0 ? 1 : 0;
+		}
+
+		$info["user_to_play"] = nextToPlay($gameId);
 
 		SQLDelete("delete from decks where user_id = $userId and card_name = $card");
 		SQLInsert("insert into placed_cards (game_id, card_name) values ($gameId, '$card')");
+		SQLUpdate("update games set
+			user_to_play = $info[user_to_play],
+			direction = $info[direction],
+			color = $color
+			where id = $gameId");
+
 		return true;
 	}
 
@@ -275,11 +308,11 @@ function placeCard($userId, $card) {
 function drawCard($userId) {
 	$options = getUnusedCards(getGameOf($userId));
 	$index = array_rand($options);
+	$card = $options[$index];
 
-	$sql = "insert into decks (user_id, card_name) values ($userId, '$options[$index]')";
-	SQLInsert($sql);
+	SQLInsert("insert into decks (user_id, card_name) values ($userId, '$card')");
 
-	return $options[$index];
+	return $card;
 }
 
 function getDirection($gameId) {
@@ -291,22 +324,23 @@ function currentPlayer($gameId) {
 }
 
 /* Not right now, but like, later.
+ * Takes skips cards into account.
+ * TODO: when there's only two players and a reverse card is present, count it
+ * as a skip card.
  */
 function nextToPlay($gameId) {
 	$sql = "select user_to_play, direction from games where id = $gameId";
 	$info = parcoursRs(SQLSelect($sql))[0];
+	$skip = cardSymbol(end(getPlacedCards($gameId))) == "skip";
 
-	$direction = $info["direction"] == 1 ? 1 : -1;
+	$direction = ($info["direction"] == 1 ? 1 : -1) * ($skip ? 2 : 1);
 	$to_play = $info["user_to_play"];
 	$players = getPlayers($gameId);
 
-	$index = array_search($to_play, $players);
+	$index = array_search($to_play, $players) + $direction;
+	$mod = count($players);
 
-	if ($direction == -1 && $index == 0) {
-		return $players[count($players) - 1];
-	}
-
-	return $players[($index + $direction) % count($players)];
+	return (abs($index * $mod) + $index) % $mod;
 }
 
 /* May not be useful, prefer issuing a custom query.

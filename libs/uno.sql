@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 21, 2020 at 01:16 PM
+-- Generation Time: Jun 25, 2020 at 07:58 PM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.6
 
@@ -28,7 +28,6 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `decks` (
-  `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `card_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -48,13 +47,6 @@ CREATE TABLE `games` (
   `direction` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `games`
---
-
-INSERT INTO `games` (`id`, `name`, `admin_id`, `has_started`, `user_to_play`, `direction`) VALUES
-(1, 'Partie Zéro', 1, 0, 1, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -67,6 +59,13 @@ CREATE TABLE `placed_cards` (
   `card_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `placed_cards`
+--
+
+INSERT INTO `placed_cards` (`id`, `game_id`, `card_name`) VALUES
+(1, 55, 'blue-9');
+
 -- --------------------------------------------------------
 
 --
@@ -77,25 +76,21 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `game_id` int(11) NOT NULL DEFAULT -1
+  `game_id` int(11) NOT NULL DEFAULT -1,
+  `cards_to_draw` int(11) NOT NULL DEFAULT 0,
+  `uno` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `password`, `game_id`) VALUES
-(1, 'johan', '1234', 1);
+INSERT INTO `users` (`id`, `name`, `password`, `game_id`, `cards_to_draw`, `uno`) VALUES
+(35, 'tom', 'web', -1, 0, 0);
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `decks`
---
-ALTER TABLE `decks`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `games`
@@ -122,28 +117,22 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `decks`
---
-ALTER TABLE `decks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `placed_cards`
 --
 ALTER TABLE `placed_cards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

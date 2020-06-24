@@ -12,3 +12,7 @@ $(function() {
         $('#join-btn')[0].click();
     });
 });
+
+function update() {
+    setTimeout(function(){document.location.reload(true);},2000);
+}

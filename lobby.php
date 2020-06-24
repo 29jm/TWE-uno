@@ -77,7 +77,7 @@
                 <input id="create-text" type="text" name="create" placeholder="Nom de la partie">
                 <input id="join-text" type="hidden" name="game">
                 <input id="create-btn" type="submit" name="action" value="Créer">
-                <input id="join-btn" type="submit" name="action" value="Rejoindre">
+                <!-- <input id="join-btn" type="submit" name="action" value="Rejoindre"> -->
             </form>
             <?php
                 if ($error = valider("errorMessage", "POST")) {

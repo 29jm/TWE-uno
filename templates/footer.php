@@ -10,6 +10,7 @@
 if (valider("connected","SESSION"))
 {
 	echo "<a href=\"index.php?action=Logout\">Se déconnecter</a>";
+	echo "<a href=\"rules.html\">Consulter les règles du jeu</a>";
 }
 ?>
 </div>

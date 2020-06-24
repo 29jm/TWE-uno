@@ -10,8 +10,9 @@ input[type=password] {
 }
 
 body {
-  text-align: center;
-  background-color:#ffd787;
+    background-color:#cdf7ff;
+    text-align: center;
+    font-family:'Palatino Linotype';
 }
 
 body > div {
@@ -22,7 +23,7 @@ body > div {
   border: solid grey 1px;
 }
 
-#game-list > li {
+#game-list td {
   cursor: pointer;
 }
 
@@ -31,12 +32,19 @@ body > div {
 }
 
 #pied {
-    position:fixed;
-	bottom:5px;left:5px;right:5px;
-	border-top :1px solid black;
-	padding:20px;
-	margin:10px;
+    position:absolute;
+    width:700px;
+    bottom:5px;
+    left: 50%;
+    transform: translate(-50%, 0);
     border:none;
+    background-color:white;
+    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+#pied > * {
+    margin:30px;
 }
 
 #divAccueilConnexion {
@@ -46,7 +54,7 @@ body > div {
     width:400px;
     height:400px;
     background-color:white;
-    border-radius: 10px;
+    border-radius: 15px;
     border:none;
     box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
 }
@@ -72,7 +80,7 @@ body > div {
     width:700px;
     padding:20px;
     background-color:white;
-    border-radius: 10px;
+    border-radius: 15px;
     border:none;
     box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
 }
@@ -83,6 +91,22 @@ th,td {
 
 table {
     margin:auto;
-    border:1px black solid;
-    border-radius: 10px;
+    border-radius: 15px;
+    background-color:#cdf7ff;
+    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+    border:none
+}
+
+th {
+background-color:#81cddc;
+}
+
+#divRules {
+    border-radius: 15px;
+    background-color:white;
+    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+    border:none;
+    width:800px;
+    padding:30px;
+    margin:30px;
 }

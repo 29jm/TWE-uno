@@ -22,14 +22,6 @@ body > div {
   border: solid grey 1px;
 }
 
-#game-list > li {
-  cursor: pointer;
-}
-
-.selected {
-  background-color: lightblue;
-}
-
 #pied {
   position: fixed;
   bottom: 5px; left: 5px; right: 5px;
@@ -66,15 +58,19 @@ body > div {
 }
 
 #div-game-list {
-    position:absolute;
+    position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: 700px;
     padding: 20px;
-    background-color:white;
+    background-color: white;
     border-radius: 10px;
-    border:none;
+    border: none;
     box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+.game:hover {
+  background-color: lightgrey;
 }
 
 th, td {

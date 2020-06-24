@@ -43,6 +43,20 @@
             }
 
             break;
+        case "refresh":
+            $games = listAvailableGames();
+
+            foreach ($games as $game) {
+                $response[] = array(
+                    "name" => $game["name"],
+                    "admin" => nameFromId($game["admin_id"]),
+                    "numPlayers" => count(getPlayers($game["id"])),
+                    "id" => $game["id"]
+                );
+            }
+
+            echo json_encode($response);
+            die;
         }
     }
 ?>
@@ -56,22 +70,11 @@
         <script src="js/jquery-3.5.1.min.js"></script>
         <script src="js/lobby.js"></script>
     </head>
-    <body onload="update();">
+    <body>
         <div id="div-game-list">
             <h2> Parties en attente de joueurs : </h2>
             <h5> Double-cliquez sur une ligne pour rejoindre la partie </h5>
-            <table id="game-list">
-            <tr><th>Id</th><th>Nom</th><th>Nombre de joueurs connectés</th><th>Créateur</th>
-            <?php
-                $games = listAvailableGames();
-
-                foreach ($games as $game) {
-                    $num = count(getPlayers($game["id"]));
-                    $createur = nameFromId($game["admin_id"]);
-                    echo "<tr class=\"game\" id=\"$game[id]\"><td>#$game[id]</td><td>$game[name]</td><td>$num</td><td>$createur</td></tr>";
-                }
-            ?>
-            </table>
+            <table id="game-list"></table>
             <form action="" method="POST">
                 <h2> Création d'une nouvelle partie : </h2>
                 <input id="create-text" type="text" name="create" placeholder="Nom de la partie">

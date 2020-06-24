@@ -85,15 +85,13 @@ function enterTurn() {
 }
 
 function exitTurn() {
-    // TODO:
-    // - disable click handlers
-
     queryGameInfo();
     queryHandler = setInterval(queryGameInfo, interval);
 }
 
 function updateOthers(players, currentPlayer) {
     let playersList = $('#players-list');
+    let oneHasUno = false;
 
     playersList.empty();
 
@@ -104,7 +102,39 @@ function updateOthers(players, currentPlayer) {
             playerInfo.addClass('player-current');
         }
 
+        if (name != username && players[name] == 1) {
+            oneHasUno = true;
+        }
+
         playersList.append(playerInfo);
+    }
+
+    if (oneHasUno) {
+        $('#anti-uno-btn').click(() => {
+            $.ajax({
+                type: "POST",
+                url: this.href,
+                data: { uno: 2 },
+                dataType: "json",
+                success: $('#anti-uno-btn').hide
+            });
+        }).show();
+    } else {
+        $('#anti-uno-btn').hide();
+    }
+
+    if (players[username] == 1) {
+        $('#uno-btn').click(() => {
+            $.ajax({
+                type: "POST",
+                url: this.href,
+                data: { uno: 1 },
+                dataType: "json",
+                success: $('#uno-btn').hide
+            });
+        }).show();
+    } else {
+        $('#uno-btn').hide();
     }
 }
 
@@ -119,7 +149,6 @@ function updatePiles(newTopCard) {
 
     piles.empty();
     piles.append(makeCard("backside").click(function(ev) {
-        console.log("Pioche cliquée");
         $.ajax({
             type: "POST",
             url: this.href,
@@ -157,7 +186,7 @@ function updateCards(newDeck) {
                 let color = "";
 
                 do {
-                    color = prompt("Entrez la couleur voulue:")
+                    color = prompt("Entrez la couleur: red, green, yellow, blue:")
 
                     if (color === null) {
                         return;

@@ -21,7 +21,7 @@
             }
 
             break;
-        case "Creer un compte":
+        case "Creer":
             $result = createAccount($name, $password);
 
             if ($result) {
@@ -74,7 +74,7 @@
                     <input type="text" name="name" placeholder="Nom d'utilisateur">
                     <input type="password" name="password" placeholder="Mot de passe">
                     <input type="submit" name="action" value="Connexion">
-                    <input type="submit" name="action" value="Créer un compte">
+                    <button type="submit" name="action" value="Creer">Créer un compte</button>
                 </form>
                 <?php
                     if ($message = valider("errorMessage", "POST")) {

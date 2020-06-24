@@ -359,6 +359,22 @@ function drawCard($userId) {
 	return $card;
 }
 
+/* Returns whether the player has really won or not.
+ */
+function screamUno($userId) {
+	if (count(getDeck($userId)) == 1) {
+		SQLUpdate("update users set uno = 1 where id = $userId");
+
+		return true;
+	}
+
+	return false;
+}
+
+function hasUnoed($userId) {
+	return SQLGetChamp("select uno from users where id = $userId");
+}
+
 function getDirection($gameId) {
 	return SQLGetChamp("select direction from games where id = $gameId");
 }

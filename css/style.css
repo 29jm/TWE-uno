@@ -164,6 +164,6 @@ th {
   border: solid #E85D75 7px;
 }
 
-#start-game, #end-game {
+.game-btn {
   display: none;
 }

@@ -81,7 +81,6 @@
         die;
     }
 
-    // TODO: critical: prevent using this when player HAS to draw cards
     if ($card = valider("place", "POST")) {
         if ($userId != currentPlayer($gameId)) {
             echo json_encode(array("success" => false, "error" => "Not your turn"));
@@ -94,7 +93,13 @@
         }
 
         if (placeCard($userId, $card)) {
-            echo json_encode(array("success" => true));
+            $won = count(getDeck($userId)) == 0;
+
+            if ($won) {
+                endGame($gameId);
+            }
+
+            echo json_encode(array("success" => true, "won" => $won));
         } else {
             echo json_encode(array("success" => false, "error" => "Invalid move"));
         }
@@ -102,27 +107,27 @@
         die;
     }
 
-    /* How to deal with black cards: an authoritative paper.
-     * The server will only ever distribute uncolored black cards, i.e. one of
-     * "plusfour" and "joker".
-     * On the contrary, every move proposed by the client is to involve a
-     * colored card, i.e. "red-3", "yellow-joker" or "green-plusfour".
-     * As such, the "decks" table will contain nothing but uncolored black
-     * cards, and "placed_cards" will contain only colored black cards.
-     */
+    if ($uno = valider("uno", "POST")) {
+        // A player declares Uno
+        if ($uno == "1") {
+            $result = screamUno($userId);
+            echo json_encode(array("sucess" => $result));
+        }
 
-    /* Le plan ici: (manque l'API backend pour le faire)
-     * Quand c'est pas le tour du joueur, on poll le serveur pour savoir quand
-     * les tours passent (le joueur en cours est stocké dans une var locale du
-     * client), et quand un tour est passé, on met à jour la carte posée au
-     * milieu ainsi que la couleur actuelle (utile de l'afficher qd le joueur
-     * pose une carte noire (à moins de changer le background de la carte noire
-     * une fois posée?)).
-     *
-     * Quand c'est le tours du joueur, on active les handlers de clic sur ses cartes
-     * et sa pioche. Chaque action envoie un POST ajax et la mise à jour de l'ui
-     * se fait dans le success handler de la requête.
-     */
+        // A players calls contr'Uno
+        if ($uno == "2") {
+            $players = getPlayers($gameId);
+
+            foreach ($players as $player) {
+                if (count(getDeck($player)) == 1 && !hasUnoed($player)) {
+                    drawCard($player);
+                    drawCard($player);
+                }
+            }
+        }
+
+        die;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -138,12 +143,14 @@
         <h1 id="game-name">
             <?php echo getGameName($gameId); ?>
         </h1>
-        <button id="start-game">Lancer la partie</button>
-        <button id="end-game">Terminer la partie</button>
+        <button id="start-game" class="game-btn">Lancer la partie</button>
+        <button id="end-game" class="game-btn">Terminer la partie</button>
         <br>
         <div id="players-list"> </div>
         <div id="card-piles"> </div>
         <div id="player-deck"> </div>
+        <button id="uno-btn" class="game-btn">Uno !</button>
+        <button id="anti-uno-btn" class="game-btn">Contr'Uno !</button>
         <pre>
             <code id="state"> </code>
         </pre>

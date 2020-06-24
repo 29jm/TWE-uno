@@ -54,7 +54,7 @@
             die;
         }
 
-        if ($start == "1" && !$started) {
+        if ($start == "1") {
             startGame($gameId);
         } else {
             endGame($gameId);
@@ -64,7 +64,7 @@
         die;
     }
 
-    if (valider("draw", "POST") == "1" && $started) {
+    if (valider("draw", "POST") == "1") {
         if ($userId != currentPlayer($gameId)) {
             echo json_encode(array("success" => false, "error" => "Not your turn"));
             die;
@@ -82,7 +82,7 @@
     }
 
     // TODO: critical: prevent using this when player HAS to draw cards
-    if ($card = valider("place", "POST") && $started) {
+    if ($card = valider("place", "POST")) {
         if ($userId != currentPlayer($gameId)) {
             echo json_encode(array("success" => false, "error" => "Not your turn"));
             die;

@@ -138,6 +138,7 @@ th {
   width: 100px;
   height: 3em;
   margin-right: 5px;
+  user-select: none;
 }
 
 .player-info > span,
@@ -161,6 +162,7 @@ th {
   width: 85px;
   height: 120px;
   margin: 5px;
+  cursor: pointer;
 }
 
 .card:hover {

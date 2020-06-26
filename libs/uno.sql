@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 25, 2020 at 07:58 PM
+-- Generation Time: Jun 26, 2020 at 03:25 PM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.6
 
@@ -86,7 +86,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `password`, `game_id`, `cards_to_draw`, `uno`) VALUES
-(35, 'tom', 'web', -1, 0, 0);
+(35, 'tom', 'web', -1, 0, 0),
+(36, 'johan', '1234', -1, 0, 0);
 
 --
 -- Indexes for dumped tables
@@ -120,19 +121,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `placed_cards`
 --
 ALTER TABLE `placed_cards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

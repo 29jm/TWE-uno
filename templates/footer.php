@@ -3,7 +3,7 @@
 
 <body>
 
-<div id="pied">
+<div id="footer" class="white-box">
 
 <?php
 // Si l'utilisateur est connecte, on affiche un lien de deconnexion 

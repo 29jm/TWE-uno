@@ -3,6 +3,9 @@
     include_once("libs/modele.php");
 
     session_start();
+    
+    /* Si l'utilisateur n'est pas connecté ou bien s'il est déjà dans une partie,
+    on le redirige vers la page adaptée */
 
     if (!valider("connected", "SESSION")) {
         header("Location: index.php");
@@ -16,7 +19,7 @@
 
     $userId = $_SESSION["userId"];
 
-    // API handlers
+    // En cas d'actions, on effectue les vérifications nécessaires et on redirige vers la page adaptée
     if ($action = valider("action")) {
         switch ($action) {
         case "Créer":
@@ -43,6 +46,20 @@
             }
 
             break;
+        case "refresh":
+            $games = listAvailableGames();
+
+            foreach ($games as $game) {
+                $response[] = array(
+                    "name" => $game["name"],
+                    "admin" => nameFromId($game["admin_id"]),
+                    "numPlayers" => count(getPlayers($game["id"])),
+                    "id" => $game["id"]
+                );
+            }
+
+            echo json_encode($response);
+            die;
         }
     }
 ?>
@@ -56,28 +73,17 @@
         <script src="js/jquery-3.5.1.min.js"></script>
         <script src="js/lobby.js"></script>
     </head>
-    <body onload="update();">
-        <div id="div-game-list">
+    <body>
+        <div id="div-game-list" class="white-box">
             <h2> Parties en attente de joueurs : </h2>
             <h5> Double-cliquez sur une ligne pour rejoindre la partie </h5>
-            <table id="game-list">
-            <tr><th>Id</th><th>Nom</th><th>Nombre de joueurs connectés</th><th>Créateur</th>
-            <?php
-                $games = listAvailableGames();
-
-                foreach ($games as $game) {
-                    $num = count(getPlayers($game["id"]));
-                    $createur = nameFromId($game["admin_id"]);
-                    echo "<tr class=\"game\" id=\"$game[id]\"><td>#$game[id]</td><td> $game[name]</td> <td>$num</td> <td>$createur </td></tr>";
-                }
-            ?>
-            </table>
+            <table id="game-list"></table>
             <form action="" method="POST">
                 <h2> Création d'une nouvelle partie : </h2>
                 <input id="create-text" type="text" name="create" placeholder="Nom de la partie">
                 <input id="join-text" type="hidden" name="game">
                 <input id="create-btn" type="submit" name="action" value="Créer">
-                <!-- <input id="join-btn" type="submit" name="action" value="Rejoindre"> -->
+                <input id="join-btn" type="submit" name="action" value="Rejoindre">
             </form>
             <?php
                 if ($error = valider("errorMessage", "POST")) {
@@ -87,6 +93,6 @@
         </div>
     </body>
     <?php
-    include("templates/footer.php");
+        include("templates/footer.php");
     ?>
 </html>

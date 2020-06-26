@@ -1,3 +1,5 @@
+/* Style général */
+
 h1 {
   text-align: center;
 }
@@ -15,98 +17,173 @@ body {
     font-family:'Palatino Linotype';
 }
 
-body > div {
-  display: inline-block;
-  padding: 5px;
-  margin-left: auto;
-  margin-right: auto;
-  border: solid grey 1px;
+.white-box {
+    border:none;
+    background-color:white;
+    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
 }
 
-#game-list td {
-  cursor: pointer;
-}
+/* Style du pied de page */
 
-.selected {
-  background-color: lightblue;
-}
-
-#pied {
-    position:absolute;
-    width:700px;
-    bottom:5px;
+#footer {
     left: 50%;
     transform: translate(-50%, 0);
-    border:none;
-    background-color:white;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
+    position: fixed;
+    width: 700px;
+    bottom: 5px;
 }
 
-#pied > * {
-    margin:30px;
+#footer > * {
+    margin: 30px;
 }
+
+/* Style de la page index.php */
 
 #divAccueilConnexion {
-    position:absolute;
+    position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width:400px;
-    height:400px;
-    background-color:white;
-    border-radius: 15px;
-    border:none;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    height: 400px;
 }
 
 #accueilConnexion {
-    position:absolute;
+    position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #accueilConnexion > * {
-    margin:10px;
+    margin: 10px;
 }
 
 #accueilConnexion > form > * {
-    margin:5px;
+    margin: 5px;
+}
+
+/* Style de la page lobby.php */
+
+#game-list td {
+  cursor: pointer;
+}
+
+#join-btn {
+    display: none;
+}
+
+.game:hover {
+  background-color: lightgrey;
 }
 
 #div-game-list {
-    position:absolute;
+    position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width:700px;
-    padding:20px;
-    background-color:white;
-    border-radius: 15px;
-    border:none;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    padding: 20px;
 }
 
-th,td {
-    padding:7px;
+th, td {
+    padding: 7px;
 }
 
 table {
-    margin:auto;
+    margin: auto;
     border-radius: 15px;
-    background-color:#cdf7ff;
+    background-color: #cdf7ff;
     box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
-    border:none
+    border: none
 }
 
 th {
-background-color:#81cddc;
+    background-color: #81cddc;
 }
 
+/* Style de la page rules.html */
+
 #divRules {
-    border-radius: 15px;
-    background-color:white;
-    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
-    border:none;
-    width:800px;
-    padding:30px;
-    margin:30px;
+    position:absolute;
+    width: 800px;
+    padding: 30px;
+    margin: 30px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+/* Style de la page rules.html */
+
+#players-list {
+  display: inline-block;
+  min-height: 50px;
+  margin: 10px auto;
+  padding:20px;
+  border-radius: 15px;
+  background-color: #e2e2e2;
+  box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+#card-piles .card {
+  display: inline-block;
+}
+
+.player-info {
+  display: inline-block;
+  line-height: 3em;
+  border: solid #62c370 1px;
+  background-color: #9ad1d4;
+  border-radius: 7px;
+  vertical-align: middle;
+  width: 100px;
+  height: 3em;
+  margin-right: 5px;
+}
+
+.player-info > span,
+.card > span {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+
+.player-current {
+  border: solid #62c370 7px;
+}
+
+.card {
+  display: inline-block;
+  text-align: center;
+  font-size: 25pt;
+  line-height: 120px;
+  border: solid #cacaca 7px;
+  border-radius: 5px;
+  width: 85px;
+  height: 120px;
+  margin: 5px;
+}
+
+.card:hover {
+  border: solid #E85D75 7px;
+  box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+.game-btn {
+  display: none;
+}
+
+#conteneur_game {
+    margin:40px;
+    padding:40px;
+}
+
+#player-deck {
+  display: inline-block;
+  min-height: 50px;
+  margin: 10px auto;
+  padding:20px;
+  border-radius: 15px;
+  background-color: #e2e2e2;
+  box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+  border: none;
 }

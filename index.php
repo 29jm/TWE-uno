@@ -1,12 +1,12 @@
 <?php
     include_once("libs/maLibUtils.php");
     include_once("libs/modele.php");
+    
+    /* Page de connexion */
 
     session_start();
 
-    /* If we were sent here from the index form.
-     * Move to a global controller.php if needed/wanted.
-     */
+    /* En cas de tentatives de connexion, déconnexion ou création de compte, on vérifie la validité des informations et on redirige vers la page adaptée */
     if ($action = valider("action")) {
         $name = valider("name");
         $password = valider("password");
@@ -21,7 +21,7 @@
             }
 
             break;
-        case "Creer un compte":
+        case "Creer":
             $result = createAccount($name, $password);
 
             if ($result) {
@@ -38,13 +38,7 @@
         }
     }
 
-   /* If the user is connected:
-    *     If the user is marked as "in game $game_id" in the DB
-    *          Redirect to the game page with proprer session variables
-    *     Else
-    *          Redirect to the lobby
-    * Else
-    *     Show the index
+   /* Si l'utilisateur est connecté, il est redirigé vers la page lobby.php si il n'est pas en jeu, game.php sinon
     */
     if (valider("connected", "SESSION")) {
         if (getGameOf($_SESSION["userId"]) != NOT_IN_GAME) {
@@ -56,7 +50,7 @@
         die;
     }
 
-    // If we get here, show the index
+    // Si l'utilisateur n'est pas connecté, on affiche le formulaire :
 ?>
 
 <!DOCTYPE html>
@@ -67,14 +61,14 @@
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <div id="divAccueilConnexion">
+        <div id="divAccueilConnexion" class="white-box">
             <div id="accueilConnexion">
             <img src="ressources/logo_uno.png" alt="logo uno">
                 <form action="" method="post">
                     <input type="text" name="name" placeholder="Nom d'utilisateur">
                     <input type="password" name="password" placeholder="Mot de passe">
                     <input type="submit" name="action" value="Connexion">
-                    <input type="submit" name="action" value="Créer un compte">
+                    <button type="submit" name="action" value="Creer">Créer un compte</button>
                 </form>
                 <?php
                     if ($message = valider("errorMessage", "POST")) {
@@ -85,4 +79,5 @@
         </div>
     </body>
 </html>
+
 
